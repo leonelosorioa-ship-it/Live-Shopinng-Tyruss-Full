@@ -1,4 +1,4 @@
-import { Eye, Heart, Volume2, VolumeX } from 'lucide-react';
+import { Eye, Heart, Maximize2, Minimize2, Share2, Volume2, VolumeX } from 'lucide-react';
 import { STORE_BRAND } from '../data/liveShopData';
 import { formatLikesCount } from '../utils/checkout';
 
@@ -6,7 +6,10 @@ interface LiveHeaderProps {
   viewerCount: number;
   likesCount: number;
   isMuted: boolean;
+  isFullscreen: boolean;
   onToggleMute: () => void;
+  onToggleFullscreen: () => void;
+  onOpenShare: () => void;
   onLike: () => void;
 }
 
@@ -14,12 +17,15 @@ export function LiveHeader({
   viewerCount,
   likesCount,
   isMuted,
+  isFullscreen,
   onToggleMute,
+  onToggleFullscreen,
+  onOpenShare,
   onLike,
 }: LiveHeaderProps) {
   return (
     <header className="relative z-20 px-3 pt-2.5 pb-3 bg-gradient-to-b from-black/90 via-black/65 to-transparent space-y-2">
-      {/* Fila 1: Logo + Nombre completo ColShopi Tienda + LIVE SHOP + Mute */}
+      {/* Fila 1: Logo + Nombre completo ColShopi Tienda + LIVE SHOP + Compartir / Pantalla completa / Mute */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className="shrink-0 w-9 h-9 rounded-full ring-2 ring-cyan-400/80 bg-black overflow-hidden shadow-md">
@@ -32,27 +38,57 @@ export function LiveHeader({
           </div>
 
           <div className="min-w-0 flex items-center gap-1.5 flex-wrap">
-            <h1 className="font-display text-[14px] font-bold tracking-tight text-white whitespace-nowrap">
+            <h1 className="font-display text-[13.5px] font-bold tracking-tight text-white whitespace-nowrap">
               {STORE_BRAND.name}
             </h1>
-            <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold tracking-wider uppercase bg-gradient-to-r from-rose-600 to-fuchsia-600 text-white shadow-[0_0_12px_rgba(225,29,72,0.75)] whitespace-nowrap">
+            <span
+              data-testid="live-shop-badge"
+              className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold tracking-wider uppercase bg-gradient-to-r from-rose-600 to-fuchsia-600 text-white shadow-[0_0_12px_rgba(225,29,72,0.75)] whitespace-nowrap animate-live-pulse"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-white/95 shrink-0" aria-hidden="true" />
               LIVE SHOP
             </span>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onToggleMute}
-          aria-label={isMuted ? 'Activar sonido del Live' : 'Silenciar sonido del Live'}
-          className="shrink-0 inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
-        >
-          {isMuted ? (
-            <VolumeX className="w-4 h-4 text-zinc-300" />
-          ) : (
-            <Volume2 className="w-4 h-4 text-cyan-300" />
-          )}
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={onOpenShare}
+            data-testid="share-live-btn"
+            aria-label="Compartir Live en redes sociales"
+            className="inline-flex items-center justify-center min-w-[34px] min-h-[34px] rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+          >
+            <Share2 className="w-3.5 h-3.5 text-cyan-300" />
+          </button>
+
+          <button
+            type="button"
+            onClick={onToggleFullscreen}
+            data-testid="fullscreen-btn"
+            aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Ampliar a pantalla completa'}
+            className="inline-flex items-center justify-center min-w-[34px] min-h-[34px] rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-3.5 h-3.5 text-emerald-300" />
+            ) : (
+              <Maximize2 className="w-3.5 h-3.5 text-zinc-200" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={onToggleMute}
+            aria-label={isMuted ? 'Activar sonido del Live' : 'Silenciar sonido del Live'}
+            className="inline-flex items-center justify-center min-w-[34px] min-h-[34px] rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+          >
+            {isMuted ? (
+              <VolumeX className="w-3.5 h-3.5 text-zinc-300" />
+            ) : (
+              <Volume2 className="w-3.5 h-3.5 text-cyan-300" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Fila 2: Marié + By Leps Digital a la izquierda, Me gusta y Espectadores a la derecha */}

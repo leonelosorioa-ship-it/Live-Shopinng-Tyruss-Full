@@ -77,6 +77,25 @@
   will-change: transform, opacity;
 }
 
+/* Efecto pulsante (agranda y encoge) para el indicador LIVE SHOP */
+@keyframes livePulseScale {
+  0%,
+  100% {
+    transform: scale(0.94);
+    box-shadow: 0 0 8px rgba(225, 29, 72, 0.55);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.95), 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+}
+
+.animate-live-pulse {
+  animation: livePulseScale 1.35s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+
 /* Ocultar scrollbar en chat y modal manteniendo usabilidad táctil */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -88,7 +107,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-live-camera,
-  .animate-float-heart {
+  .animate-float-heart,
+  .animate-live-pulse {
     animation: none !important;
   }
 }

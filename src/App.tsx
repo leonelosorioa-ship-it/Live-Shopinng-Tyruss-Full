@@ -13,6 +13,7 @@ import { FloatingProductCard } from './components/FloatingProductCard';
 import { LiveChatFeed } from './components/LiveChatFeed';
 import { LiveFooterBar, type FloatingHeartParticle } from './components/LiveFooterBar';
 import { CheckoutModal, type ModalTab } from './components/CheckoutModal';
+import { ShareModal } from './components/ShareModal';
 import { liveAudio } from './utils/liveAudio';
 
 function getInitialAutostart(): boolean {
@@ -24,6 +25,7 @@ export default function App() {
   const autostart = getInitialAutostart();
   const [audioActivated, setAudioActivated] = useState<boolean>(autostart);
   const [isMuted, setIsMuted] = useState<boolean>(!autostart);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [activeSceneIndex, setActiveSceneIndex] = useState<number>(0);
 
   const [viewerCount, setViewerCount] = useState<number>(612);
@@ -40,6 +42,16 @@ export default function App() {
     open: false,
     tab: 'checkout',
   });
+  const [shareOpen, setShareOpen] = useState<boolean>(false);
+
+  // Sincronizar estado de pantalla completa nativa para ocultar la barra URL
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   // Cambio automático de escenas en el stream en vivo cada 8 segundos
   useEffect(() => {
@@ -89,10 +101,33 @@ export default function App() {
     };
   }, []);
 
+  const handleToggleFullscreen = useCallback(async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } else if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // Algunos iframes restringen requestFullscreen; en ese caso ampliamos el viewport local
+      setIsFullscreen((prev) => !prev);
+    }
+  }, []);
+
   const handleActivateAudio = useCallback(() => {
     setAudioActivated(true);
     setIsMuted(false);
     liveAudio.activate();
+
+    // En móvil, intentar ocultar barra URL al entrar al Live
+    if (typeof window !== 'undefined' && window.innerWidth <= 500) {
+      window.scrollTo(0, 1);
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
   }, []);
 
   const handleToggleMute = useCallback(() => {
@@ -162,8 +197,14 @@ export default function App() {
 
   return (
     <main className="w-full h-[100dvh] bg-black flex items-center justify-center overflow-hidden">
-      {/* Contenedor vertical estilo Smartphone (9:16), máx 430px */}
-      <div className="relative w-full max-w-[430px] h-[100dvh] sm:h-[min(100dvh,880px)] sm:rounded-[28px] bg-black border border-white/12 shadow-[0_0_80px_rgba(6,182,212,0.14)] overflow-hidden flex flex-col justify-between">
+      {/* Contenedor vertical estilo Smartphone (9:16), expandible a pantalla completa */}
+      <div
+        className={`relative w-full h-[100dvh] bg-black overflow-hidden flex flex-col justify-between transition-all duration-200 ${
+          isFullscreen
+            ? 'max-w-[460px] rounded-none border-x border-white/10'
+            : 'max-w-[430px] sm:h-[100dvh] sm:rounded-[24px] border border-white/12 shadow-[0_0_80px_rgba(6,182,212,0.14)]'
+        }`}
+      >
         {/* Capa 1: Video / Escenario en vivo de fondo */}
         <LiveVideoStage
           activeSceneIndex={activeSceneIndex}
@@ -175,7 +216,10 @@ export default function App() {
           viewerCount={viewerCount}
           likesCount={likesCount}
           isMuted={isMuted}
+          isFullscreen={isFullscreen}
           onToggleMute={handleToggleMute}
+          onToggleFullscreen={handleToggleFullscreen}
+          onOpenShare={() => setShareOpen(true)}
           onLike={handleLike}
         />
 
@@ -232,6 +276,9 @@ export default function App() {
             </button>
           </div>
         )}
+
+        {/* Modal para compartir en redes sociales (sin exponer URL) */}
+        <ShareModal isOpen={shareOpen} onClose={() => setShareOpen(false)} />
 
         {/* Modal de Checkout, Combos e Ingredientes */}
         <CheckoutModal
