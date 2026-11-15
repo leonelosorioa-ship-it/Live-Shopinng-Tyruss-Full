@@ -1,0 +1,8 @@
+{
+  "name": "ColShopi Tienda Live Shop — Tyruss Full",
+  "description": "Experiencia de Live Shopping en vivo de ColShopi Tienda (By Leps Digital) con Marié presentando Tyruss Full 500g y acceso gratis a la App TyroFem 30D.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

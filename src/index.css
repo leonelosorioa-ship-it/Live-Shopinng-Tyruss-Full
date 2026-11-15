@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background-color: #000000;
+    color: #ffffff;
+    overflow: hidden;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Máscara suave para el flujo de chat en vivo */
+.chat-mask {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 18%, black 38%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 18%, black 38%, black 100%);
+}
+
+/* Animación sutil tipo cámara en vivo (Ken Burns) */
+@keyframes liveKenBurns {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.06) translate3d(-1.2%, -1%, 0);
+  }
+  100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.animate-live-camera {
+  animation: liveKenBurns 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Animación de corazones flotantes al dar Me gusta */
+@keyframes floatHeartUp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translate3d(var(--drift-x, 8px), -32px, 0) scale(1.1) rotate(var(--rot, -8deg));
+  }
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--drift-x, 8px) * 1.8), -175px, 0) scale(0.85) rotate(calc(var(--rot, -8deg) * -1.5));
+  }
+}
+
+.animate-float-heart {
+  animation: floatHeartUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Ocultar scrollbar en chat y modal manteniendo usabilidad táctil */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-live-camera,
+  .animate-float-heart {
+    animation: none !important;
+  }
+}
