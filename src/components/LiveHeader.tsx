@@ -1,4 +1,4 @@
-import { Eye, Heart, Maximize2, Minimize2, Share2, Volume2, VolumeX } from 'lucide-react';
+import { Eye, Heart, Volume2, VolumeX } from 'lucide-react';
 import { STORE_BRAND } from '../data/liveShopData';
 import { formatLikesCount } from '../utils/checkout';
 
@@ -6,10 +6,7 @@ interface LiveHeaderProps {
   viewerCount: number;
   likesCount: number;
   isMuted: boolean;
-  isFullscreen: boolean;
   onToggleMute: () => void;
-  onToggleFullscreen: () => void;
-  onOpenShare: () => void;
   onLike: () => void;
 }
 
@@ -17,10 +14,7 @@ export function LiveHeader({
   viewerCount,
   likesCount,
   isMuted,
-  isFullscreen,
   onToggleMute,
-  onToggleFullscreen,
-  onOpenShare,
   onLike,
 }: LiveHeaderProps) {
   return (
@@ -52,30 +46,6 @@ export function LiveHeader({
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={onOpenShare}
-            data-testid="share-live-btn"
-            aria-label="Compartir Live en redes sociales"
-            className="inline-flex items-center justify-center min-w-[34px] min-h-[34px] rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
-          >
-            <Share2 className="w-3.5 h-3.5 text-cyan-300" />
-          </button>
-
-          <button
-            type="button"
-            onClick={onToggleFullscreen}
-            data-testid="fullscreen-btn"
-            aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Ampliar a pantalla completa'}
-            className="inline-flex items-center justify-center min-w-[34px] min-h-[34px] rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
-          >
-            {isFullscreen ? (
-              <Minimize2 className="w-3.5 h-3.5 text-emerald-300" />
-            ) : (
-              <Maximize2 className="w-3.5 h-3.5 text-zinc-200" />
-            )}
-          </button>
-
           <button
             type="button"
             onClick={onToggleMute}

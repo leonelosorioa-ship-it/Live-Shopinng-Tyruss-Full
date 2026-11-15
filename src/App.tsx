@@ -25,7 +25,6 @@ export default function App() {
   const autostart = getInitialAutostart();
   const [audioActivated, setAudioActivated] = useState<boolean>(autostart);
   const [isMuted, setIsMuted] = useState<boolean>(!autostart);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [activeSceneIndex, setActiveSceneIndex] = useState<number>(0);
 
   const [viewerCount, setViewerCount] = useState<number>(612);
@@ -43,15 +42,6 @@ export default function App() {
     tab: 'checkout',
   });
   const [shareOpen, setShareOpen] = useState<boolean>(false);
-
-  // Sincronizar estado de pantalla completa nativa para ocultar la barra URL
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
 
   // Cambio automático de escenas en el stream en vivo cada 8 segundos
   useEffect(() => {
@@ -101,32 +91,14 @@ export default function App() {
     };
   }, []);
 
-  const handleToggleFullscreen = useCallback(async () => {
-    try {
-      if (!document.fullscreenElement) {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
-      } else if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      }
-    } catch {
-      // Algunos iframes restringen requestFullscreen; en ese caso ampliamos el viewport local
-      setIsFullscreen((prev) => !prev);
-    }
-  }, []);
-
   const handleActivateAudio = useCallback(() => {
     setAudioActivated(true);
     setIsMuted(false);
     liveAudio.activate();
 
-    // En móvil, intentar ocultar barra URL al entrar al Live
+    // En móvil, deslizar sutilmente sin activar Fullscreen API para ocultar barra URL sin avisos del navegador
     if (typeof window !== 'undefined' && window.innerWidth <= 500) {
       window.scrollTo(0, 1);
-      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
     }
   }, []);
 
@@ -197,14 +169,8 @@ export default function App() {
 
   return (
     <main className="w-full h-[100dvh] bg-black flex items-center justify-center overflow-hidden">
-      {/* Contenedor vertical estilo Smartphone (9:16), expandible a pantalla completa */}
-      <div
-        className={`relative w-full h-[100dvh] bg-black overflow-hidden flex flex-col justify-between transition-all duration-200 ${
-          isFullscreen
-            ? 'max-w-[460px] rounded-none border-x border-white/10'
-            : 'max-w-[430px] sm:h-[100dvh] sm:rounded-[24px] border border-white/12 shadow-[0_0_80px_rgba(6,182,212,0.14)]'
-        }`}
-      >
+      {/* Contenedor vertical estilo Smartphone (9:16) respetando los espacios y bordes seguros del dispositivo */}
+      <div className="relative w-full max-w-[430px] h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-black overflow-hidden flex flex-col justify-between sm:rounded-[24px] border border-white/12 shadow-[0_0_80px_rgba(6,182,212,0.14)]">
         {/* Capa 1: Video / Escenario en vivo de fondo */}
         <LiveVideoStage
           activeSceneIndex={activeSceneIndex}
@@ -216,10 +182,7 @@ export default function App() {
           viewerCount={viewerCount}
           likesCount={likesCount}
           isMuted={isMuted}
-          isFullscreen={isFullscreen}
           onToggleMute={handleToggleMute}
-          onToggleFullscreen={handleToggleFullscreen}
-          onOpenShare={() => setShareOpen(true)}
           onLike={handleLike}
         />
 
@@ -238,6 +201,7 @@ export default function App() {
         {/* Capa 4: Barra inferior de acciones (Thumb zone) */}
         <LiveFooterBar
           onOpenCheckout={() => setModalState({ open: true, tab: 'checkout' })}
+          onOpenShare={() => setShareOpen(true)}
           onSendComment={handleSendComment}
           onLike={handleLike}
           floatingHearts={floatingHearts}
