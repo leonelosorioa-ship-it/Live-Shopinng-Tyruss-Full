@@ -43,6 +43,22 @@ export default function App() {
   });
   const [shareOpen, setShareOpen] = useState<boolean>(false);
 
+  // Evitar cualquier aviso de descarga/instalación de app y ocultar barra URL al cargar en móvil
+  useEffect(() => {
+    const preventInstallPrompt = (e: Event) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeinstallprompt', preventInstallPrompt);
+
+    if (window.innerWidth <= 500) {
+      window.setTimeout(() => window.scrollTo(0, 1), 60);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', preventInstallPrompt);
+    };
+  }, []);
+
   // Cambio automático de escenas en el stream en vivo cada 8 segundos
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -168,7 +184,7 @@ export default function App() {
     COMBO_OPTIONS.find((item) => item.id === selectedComboId) ?? defaultCombo;
 
   return (
-    <main className="w-full h-[100dvh] bg-black flex items-center justify-center overflow-hidden">
+    <main className="sticky top-0 w-full h-[100dvh] bg-black flex items-center justify-center overflow-hidden">
       {/* Contenedor vertical estilo Smartphone (9:16) respetando los espacios y bordes seguros del dispositivo */}
       <div className="relative w-full max-w-[430px] h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-black overflow-hidden flex flex-col justify-between sm:rounded-[24px] border border-white/12 shadow-[0_0_80px_rgba(6,182,212,0.14)]">
         {/* Capa 1: Video / Escenario en vivo de fondo */}
