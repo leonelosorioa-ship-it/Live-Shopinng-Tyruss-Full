@@ -20,12 +20,12 @@ export function LiveChatFeed({ messages }: LiveChatFeedProps) {
   return (
     <section
       aria-label="Chat en vivo de compradoras"
-      className="w-[calc(100%-164px)] max-w-[250px] pointer-events-auto"
+      className="w-[calc(100%-130px)] max-w-[280px] pointer-events-auto"
     >
       <div
         ref={scrollRef}
         data-testid="live-chat-feed"
-        className="max-h-[196px] overflow-y-auto no-scrollbar chat-mask flex flex-col gap-1.5 pr-1 pt-6"
+        className="max-h-[172px] overflow-y-auto no-scrollbar chat-mask flex flex-col gap-1.5 pr-1 pt-5"
       >
         {messages.map((msg) => (
           <div

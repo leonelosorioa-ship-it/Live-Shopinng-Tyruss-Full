@@ -187,7 +187,6 @@ export default function App() {
             <FloatingProductCard
               selectedCombo={selectedCombo}
               onOpenCheckout={() => setModalState({ open: true, tab: 'checkout' })}
-              onOpenDetails={() => setModalState({ open: true, tab: 'details' })}
             />
           </div>
         </div>
