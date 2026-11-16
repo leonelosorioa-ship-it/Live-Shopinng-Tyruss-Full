@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { COMBO_OPTIONS, STORE_BRAND } from '../data/liveShopData';
+import { BATIDO_VERDE_ADDON, COMBO_OPTIONS, STORE_BRAND } from '../data/liveShopData';
 import {
   buildWhatsAppOrderMessage,
   buildWhatsAppUrl,
+  calculateOrderTotal,
   formatCOP,
   formatLikesCount,
   getComboSavings,
@@ -80,4 +81,24 @@ test('buildWhatsAppOrderMessage includes combo, price, TyroFem bonus, and custom
   const url = buildWhatsAppUrl(STORE_BRAND.whatsappNumber, message);
   assert.ok(url.startsWith('https://wa.me/573235700653?text='));
   assert.ok(url.includes(encodeURIComponent('Laura Gómez')));
+});
+
+test('calculateOrderTotal and WhatsApp message include optional Batido Verde when selected', () => {
+  const combo = COMBO_OPTIONS[2]; // $179.800
+  assert.equal(calculateOrderTotal(combo, false), 179800);
+  assert.equal(calculateOrderTotal(combo, true), 179800 + BATIDO_VERDE_ADDON.price);
+
+  const messageWithAddon = buildWhatsAppOrderMessage(
+    combo,
+    {
+      fullName: 'Laura Gómez',
+      phone: '3001234567',
+      city: 'Medellín',
+      address: 'Cra 43A # 1-50, El Poblado',
+    },
+    true
+  );
+
+  assert.match(messageWithAddon, /Batido Verde \(Linazamix\)/);
+  assert.match(messageWithAddon, /\$194\.800 COP/);
 });

@@ -3,18 +3,27 @@ import { Play, Sparkles, Volume2 } from 'lucide-react';
 import {
   COMBO_OPTIONS,
   INITIAL_CHAT_MESSAGES,
-  LIVE_SCENES,
   SIMULATED_CHAT_QUEUE,
   type ChatMessage,
 } from './data/liveShopData';
 import { LiveVideoStage } from './components/LiveVideoStage';
 import { LiveHeader } from './components/LiveHeader';
-import { FloatingProductCard } from './components/FloatingProductCard';
 import { LiveChatFeed } from './components/LiveChatFeed';
 import { LiveFooterBar, type FloatingHeartParticle } from './components/LiveFooterBar';
 import { CheckoutModal, type ModalTab } from './components/CheckoutModal';
-import { ShareModal } from './components/ShareModal';
+import { LiveEndedOverlay } from './components/LiveEndedOverlay';
 import { liveAudio } from './utils/liveAudio';
+import {
+  FINAL_URGENCY_STOCK,
+  INITIAL_URGENCY_STOCK,
+  canStartLiveVideo,
+  getNextUrgencyDelayMs,
+  hasFinishedLiveInSession,
+  markLiveFinishedInSession,
+  nextCartDemandCount,
+  nextUrgencyStockCount,
+} from './utils/liveSession';
+import { trackMetaPixelEvent } from './utils/metaPixel';
 
 function getInitialAutostart(): boolean {
   if (typeof window === 'undefined') return false;
@@ -23,17 +32,29 @@ function getInitialAutostart(): boolean {
 
 export default function App() {
   const autostart = getInitialAutostart();
-  const [audioActivated, setAudioActivated] = useState<boolean>(autostart);
-  const [isMuted, setIsMuted] = useState<boolean>(!autostart);
-  const [activeSceneIndex, setActiveSceneIndex] = useState<number>(0);
+  const [liveEnded, setLiveEnded] = useState<boolean>(() => hasFinishedLiveInSession());
+  const [audioActivated, setAudioActivated] = useState<boolean>(() =>
+    hasFinishedLiveInSession() ? true : autostart
+  );
+  const [isMuted, setIsMuted] = useState<boolean>(() =>
+    hasFinishedLiveInSession() ? true : !autostart
+  );
 
   const [viewerCount, setViewerCount] = useState<number>(612);
-  const [likesCount, setLikesCount] = useState<number>(4800);
+  const [likesCount, setLikesCount] = useState<number>(4844);
+  const [cartDemandCount, setCartDemandCount] = useState<number>(72);
+  const [remainingProducts, setRemainingProducts] = useState<number>(() =>
+    hasFinishedLiveInSession() ? FINAL_URGENCY_STOCK : INITIAL_URGENCY_STOCK
+  );
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [floatingHearts, setFloatingHearts] = useState<FloatingHeartParticle[]>([]);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
   const chatCursorRef = useRef<number>(0);
   const heartIdRef = useRef<number>(1);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const remainingSecondsRef = useRef<number | null>(null);
+  const videoDurationRef = useRef<number | null>(null);
 
   const defaultCombo = COMBO_OPTIONS.find((c) => c.isDefault) ?? COMBO_OPTIONS[2];
   const [selectedComboId, setSelectedComboId] = useState<string>(defaultCombo.id);
@@ -41,30 +62,21 @@ export default function App() {
     open: false,
     tab: 'checkout',
   });
-  const [shareOpen, setShareOpen] = useState<boolean>(false);
 
-  // Evitar cualquier aviso de descarga/instalación de app y ocultar barra URL al cargar en móvil
+  // Evitar aviso de instalación de app y facilitar colapso de barra URL en móvil sin Fullscreen API
   useEffect(() => {
     const preventInstallPrompt = (e: Event) => {
       e.preventDefault();
     };
     window.addEventListener('beforeinstallprompt', preventInstallPrompt);
 
-    if (window.innerWidth <= 500) {
-      window.setTimeout(() => window.scrollTo(0, 1), 60);
+    if (window.innerWidth <= 639 && window.matchMedia('(pointer: coarse)').matches) {
+      window.setTimeout(() => window.scrollTo(0, 64), 90);
     }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', preventInstallPrompt);
     };
-  }, []);
-
-  // Cambio automático de escenas en el stream en vivo cada 8 segundos
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveSceneIndex((prev) => (prev + 1) % LIVE_SCENES.length);
-    }, 8000);
-    return () => window.clearInterval(timer);
   }, []);
 
   // Variación realista del número de espectadores en vivo
@@ -78,8 +90,110 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, []);
 
-  // Inyección automática de mensajes simulados de usuarias colombianas y Marié
+  // Incremento orgánico de personas agregando productos al carrito durante el Live
   useEffect(() => {
+    if (liveEnded) return;
+    const timer = window.setInterval(() => {
+      setCartDemandCount((prev) => nextCartDemandCount(prev));
+    }, 8500);
+    return () => window.clearInterval(timer);
+  }, [liveEnded]);
+
+  // Reducción aleatoria de unidades disponibles (de 125 a 16 al terminar el Live)
+  useEffect(() => {
+    if (liveEnded) {
+      setRemainingProducts(FINAL_URGENCY_STOCK);
+      return;
+    }
+    if (!audioActivated) return;
+
+    let timerId: number | undefined;
+    let cancelled = false;
+
+    const scheduleDecrement = () => {
+      timerId = window.setTimeout(() => {
+        if (cancelled) return;
+        setRemainingProducts((prev) =>
+          nextUrgencyStockCount(
+            prev,
+            Math.random(),
+            remainingSecondsRef.current,
+            videoDurationRef.current,
+            false
+          )
+        );
+        scheduleDecrement();
+      }, getNextUrgencyDelayMs());
+    };
+
+    scheduleDecrement();
+
+    return () => {
+      cancelled = true;
+      if (timerId !== undefined) window.clearTimeout(timerId);
+    };
+  }, [audioActivated, liveEnded]);
+
+  const spawnFloatingHeart = useCallback(
+    (isSimulated = false, forcedKind?: 'heart' | 'like') => {
+      setLikesCount((prev) => prev + 1);
+      if (!isSimulated) {
+        liveAudio.playLikePop();
+      }
+
+      const heartPalette = ['text-rose-500', 'text-pink-400', 'text-fuchsia-400', 'text-red-500'];
+      const likePalette = ['text-cyan-300', 'text-sky-400'];
+      const id = heartIdRef.current++;
+      const kind: 'heart' | 'like' =
+        forcedKind ?? (isSimulated && id % 4 === 0 ? 'like' : 'heart');
+      const driftX = Math.round(Math.random() * 38 - 28);
+      const rotate = Math.round((Math.random() - 0.5) * 22);
+      const colorClass =
+        kind === 'like'
+          ? likePalette[id % likePalette.length]
+          : heartPalette[id % heartPalette.length];
+
+      setFloatingHearts((prev) => [...prev.slice(-8), { id, driftX, rotate, colorClass, kind }]);
+      window.setTimeout(() => {
+        setFloatingHearts((prev) => prev.filter((item) => item.id !== id));
+      }, 2450);
+    },
+    []
+  );
+
+  // Simulación orgánica y moderada de corazones y "Me gusta" de otras mujeres viendo el Live
+  useEffect(() => {
+    if (liveEnded) return;
+    let nextTimer: number | undefined;
+    let followUpTimer: number | undefined;
+    let cancelled = false;
+
+    const scheduleNext = (delayMs: number) => {
+      nextTimer = window.setTimeout(() => {
+        if (cancelled) return;
+        spawnFloatingHeart(true);
+        if (Math.random() < 0.2) {
+          followUpTimer = window.setTimeout(() => {
+            if (!cancelled) spawnFloatingHeart(true);
+          }, 380);
+        }
+        const organicDelay = 1600 + Math.round(Math.random() * 1300);
+        scheduleNext(organicDelay);
+      }, delayMs);
+    };
+
+    scheduleNext(950);
+
+    return () => {
+      cancelled = true;
+      if (nextTimer !== undefined) window.clearTimeout(nextTimer);
+      if (followUpTimer !== undefined) window.clearTimeout(followUpTimer);
+    };
+  }, [liveEnded, spawnFloatingHeart]);
+
+  // Inyección automática más pausada de mensajes de las mujeres asistentes y Marié
+  useEffect(() => {
+    if (liveEnded) return;
     const timer = window.setInterval(() => {
       const nextTemplate =
         SIMULATED_CHAT_QUEUE[chatCursorRef.current % SIMULATED_CHAT_QUEUE.length];
@@ -92,13 +206,10 @@ export default function App() {
       };
 
       setChatMessages((prev) => [...prev.slice(-18), newMessage]);
-      if (!liveAudio.isMuted()) {
-        liveAudio.playMessagePing();
-      }
-    }, 4500);
+    }, 11000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [liveEnded]);
 
   // Limpieza del controlador de audio al desmontar
   useEffect(() => {
@@ -107,39 +218,85 @@ export default function App() {
     };
   }, []);
 
-  const handleActivateAudio = useCallback(() => {
-    setAudioActivated(true);
-    setIsMuted(false);
-    liveAudio.activate();
+  const handleTimeProgress = useCallback(
+    (remaining: number | null, totalDuration: number | null = null) => {
+      setRemainingSeconds(remaining);
+      remainingSecondsRef.current = remaining;
+      if (totalDuration !== null && Number.isFinite(totalDuration) && totalDuration > 0) {
+        videoDurationRef.current = totalDuration;
+      }
+      if (audioActivated && !liveEnded && remaining !== null && remaining <= 3) {
+        setRemainingProducts(FINAL_URGENCY_STOCK);
+      }
+    },
+    [audioActivated, liveEnded]
+  );
 
-    // En móvil, deslizar sutilmente sin activar Fullscreen API para ocultar barra URL sin avisos del navegador
-    if (typeof window !== 'undefined' && window.innerWidth <= 500) {
-      window.scrollTo(0, 1);
-    }
+  const handleVideoEnded = useCallback(() => {
+    markLiveFinishedInSession();
+    setRemainingProducts(FINAL_URGENCY_STOCK);
+    setLiveEnded(true);
   }, []);
 
+  const handleActivateAudio = useCallback(() => {
+    if (!canStartLiveVideo(liveEnded)) return;
+
+    setAudioActivated(true);
+    setIsMuted(false);
+    liveAudio.setMuted(false);
+    trackMetaPixelEvent('ViewContent', {
+      content_name: 'Tyruss Full 500g Live Shop',
+      content_category: 'Live Shopping',
+      currency: 'COP',
+      value: defaultCombo.price,
+    });
+
+    const video = videoRef.current;
+    if (video) {
+      video.muted = false;
+      video.currentTime = 0;
+      video.play().catch(() => {
+        // Si el navegador exige mute para reproducir, mantener reproducción silenciada
+        video.muted = true;
+        setIsMuted(true);
+        void video.play().catch(() => {});
+      });
+    }
+
+    if (
+      typeof window !== 'undefined' &&
+      window.innerWidth <= 639 &&
+      window.matchMedia('(pointer: coarse)').matches
+    ) {
+      window.scrollTo({ top: 64, behavior: 'smooth' });
+    }
+  }, [defaultCombo.price, liveEnded]);
+
   const handleToggleMute = useCallback(() => {
+    if (!canStartLiveVideo(liveEnded)) return;
     setAudioActivated(true);
     setIsMuted((prev) => {
       const nextMuted = !prev;
       liveAudio.setMuted(nextMuted);
+
+      const video = videoRef.current;
+      if (video) {
+        video.muted = nextMuted;
+        if (video.paused) {
+          void video.play().catch(() => {});
+        }
+      }
+
       return nextMuted;
     });
-  }, []);
+  }, [liveEnded]);
 
-  const handleLike = useCallback(() => {
-    setLikesCount((prev) => prev + 1);
-    liveAudio.playLikePop();
-
-    const id = heartIdRef.current++;
-    const driftX = Math.round((Math.random() - 0.5) * 28);
-    const rotate = Math.round((Math.random() - 0.5) * 26);
-
-    setFloatingHearts((prev) => [...prev.slice(-10), { id, driftX, rotate }]);
-    window.setTimeout(() => {
-      setFloatingHearts((prev) => prev.filter((item) => item.id !== id));
-    }, 1550);
-  }, []);
+  const handleLike = useCallback(
+    (kind: 'heart' | 'like' = 'heart') => {
+      spawnFloatingHeart(false, kind);
+    },
+    [spawnFloatingHeart]
+  );
 
   const handleSendComment = useCallback((text: string) => {
     const userMessage: ChatMessage = {
@@ -180,17 +337,18 @@ export default function App() {
     }, 1100);
   }, []);
 
-  const selectedCombo =
-    COMBO_OPTIONS.find((item) => item.id === selectedComboId) ?? defaultCombo;
-
   return (
     <main className="sticky top-0 w-full h-[100dvh] bg-black flex items-center justify-center overflow-hidden">
-      {/* Contenedor vertical estilo Smartphone (9:16) respetando los espacios y bordes seguros del dispositivo */}
-      <div className="relative w-full max-w-[430px] h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-black overflow-hidden flex flex-col justify-between sm:rounded-[24px] border border-white/12 shadow-[0_0_80px_rgba(6,182,212,0.14)]">
-        {/* Capa 1: Video / Escenario en vivo de fondo */}
+      {/* Contenedor a pantalla completa en móvil (edge-to-edge) y marco 9:16 en escritorio */}
+      <div className="relative w-full max-w-none sm:max-w-[430px] h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-black overflow-hidden flex flex-col justify-between rounded-none border-0 sm:rounded-[24px] sm:border sm:border-white/12 sm:shadow-[0_0_80px_rgba(6,182,212,0.14)]">
+        {/* Capa 1: Video de fondo de la transmisión en vivo */}
         <LiveVideoStage
-          activeSceneIndex={activeSceneIndex}
-          onSelectScene={setActiveSceneIndex}
+          videoRef={videoRef}
+          isMuted={isMuted}
+          audioActivated={audioActivated}
+          liveEnded={liveEnded}
+          onVideoEnded={handleVideoEnded}
+          onTimeProgress={handleTimeProgress}
         />
 
         {/* Capa 2: Header Superior */}
@@ -198,33 +356,40 @@ export default function App() {
           viewerCount={viewerCount}
           likesCount={likesCount}
           isMuted={isMuted}
+          liveEnded={liveEnded}
+          remainingSeconds={remainingSeconds}
           onToggleMute={handleToggleMute}
           onLike={handleLike}
         />
 
-        {/* Capa 3: Zona intermedia — Chat (inferior izquierdo) + Tarjeta de Producto (derecha) */}
-        <div className="relative z-10 flex-1 flex items-end justify-between gap-2 px-3 pb-2 pointer-events-none">
+        {/* Capa 3: Zona intermedia — Chat (inferior izquierdo) dejando el video limpio */}
+        <div className="relative z-10 flex-1 flex items-end justify-start px-3 pb-2 pointer-events-none">
           <LiveChatFeed messages={chatMessages} />
-
-          <div className="pointer-events-auto shrink-0 self-end">
-            <FloatingProductCard
-              selectedCombo={selectedCombo}
-              onOpenCheckout={() => setModalState({ open: true, tab: 'checkout' })}
-            />
-          </div>
         </div>
 
         {/* Capa 4: Barra inferior de acciones (Thumb zone) */}
         <LiveFooterBar
-          onOpenCheckout={() => setModalState({ open: true, tab: 'checkout' })}
-          onOpenShare={() => setShareOpen(true)}
+          onOpenCheckout={() => {
+            setCartDemandCount((prev) => nextCartDemandCount(prev));
+            const activeCombo =
+              COMBO_OPTIONS.find((item) => item.id === selectedComboId) ?? defaultCombo;
+            trackMetaPixelEvent('InitiateCheckout', {
+              content_name: activeCombo.title,
+              currency: 'COP',
+              value: activeCombo.price,
+              num_items: 1,
+            });
+            setModalState({ open: true, tab: 'checkout' });
+          }}
           onSendComment={handleSendComment}
           onLike={handleLike}
           floatingHearts={floatingHearts}
+          cartDemandCount={cartDemandCount}
+          remainingProducts={remainingProducts}
         />
 
         {/* Capa flotante inicial para activar el sonido del Live (encima de tarjetas y chat) */}
-        {!audioActivated && (
+        {!audioActivated && !liveEnded && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/65 backdrop-blur-sm px-6">
             <button
               type="button"
@@ -257,8 +422,23 @@ export default function App() {
           </div>
         )}
 
-        {/* Modal para compartir en redes sociales (sin exponer URL) */}
-        <ShareModal isOpen={shareOpen} onClose={() => setShareOpen(false)} />
+        {/* Aviso de llamado a la acción al finalizar el Live (sin reiniciar el video desde cero) */}
+        {liveEnded && (
+          <LiveEndedOverlay
+            remainingProducts={remainingProducts}
+            onOpenCheckout={() => {
+              const activeCombo =
+                COMBO_OPTIONS.find((item) => item.id === selectedComboId) ?? defaultCombo;
+              trackMetaPixelEvent('InitiateCheckout', {
+                content_name: activeCombo.title,
+                currency: 'COP',
+                value: activeCombo.price,
+                num_items: 1,
+              });
+              setModalState({ open: true, tab: 'checkout' });
+            }}
+          />
+        )}
 
         {/* Modal de Checkout, Combos e Ingredientes */}
         <CheckoutModal

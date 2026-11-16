@@ -1,4 +1,4 @@
-import type { ComboOption } from '../data/liveShopData';
+import { BATIDO_VERDE_ADDON, type ComboOption } from '../data/liveShopData';
 
 export interface CheckoutFormValues {
   fullName: string;
@@ -40,6 +40,13 @@ export function getComboSavings(combo: ComboOption): number {
 }
 
 /**
+ * Calcula el total del pedido sumando el Batido Verde opcional cuando se selecciona.
+ */
+export function calculateOrderTotal(combo: ComboOption, includeBatidoVerde: boolean): number {
+  return combo.price + (includeBatidoVerde ? BATIDO_VERDE_ADDON.price : 0);
+}
+
+/**
  * Valida los campos obligatorios del formulario de checkout contra entrega.
  */
 export function validateCheckoutForm(values: CheckoutFormValues): CheckoutFormErrors {
@@ -70,11 +77,13 @@ export function validateCheckoutForm(values: CheckoutFormValues): CheckoutFormEr
  */
 export function buildWhatsAppOrderMessage(
   combo: ComboOption,
-  customer: CheckoutFormValues
+  customer: CheckoutFormValues,
+  includeBatidoVerde = false
 ): string {
   const bonusText = combo.isVip
     ? 'Acceso 100% GRATIS a App TyroFem 30D VIP'
     : 'Acceso 100% GRATIS a App TyroFem 30D';
+  const totalAmount = calculateOrderTotal(combo, includeBatidoVerde);
 
   const lines = [
     '🌿 *NUEVO PEDIDO — COLSHOPI TIENDA LIVE SHOP* 🌿',
@@ -82,7 +91,10 @@ export function buildWhatsAppOrderMessage(
     '👋 ¡Hola Marié! Quiero confirmar mi pedido del Live:',
     '',
     `📦 *Producto:* Tyruss Full (500g) — ${combo.title}`,
-    `💰 *Valor Total:* ${formatCOP(combo.price)} COP`,
+    ...(includeBatidoVerde
+      ? [`🥗 *Adición:* ${BATIDO_VERDE_ADDON.title} (+${formatCOP(BATIDO_VERDE_ADDON.price)} COP)`]
+      : []),
+    `💰 *Valor Total:* ${formatCOP(totalAmount)} COP`,
     `🎁 *Bonificación:* ${bonusText}`,
     '🚚 *Modalidad:* Envío nacional / Pago contra entrega',
     '',

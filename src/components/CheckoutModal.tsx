@@ -2,15 +2,16 @@ import { useState, type FormEvent } from 'react';
 import {
   Check,
   CheckCircle2,
-  Copy,
   ExternalLink,
   Gift,
+  Plus,
   ShieldCheck,
   Sparkles,
   Truck,
   X,
 } from 'lucide-react';
 import {
+  BATIDO_VERDE_ADDON,
   COMBO_OPTIONS,
   PRODUCT_INFO,
   STORE_BRAND,
@@ -19,12 +20,14 @@ import {
 import {
   buildWhatsAppOrderMessage,
   buildWhatsAppUrl,
+  calculateOrderTotal,
   formatCOP,
   getComboSavings,
   validateCheckoutForm,
   type CheckoutFormErrors,
   type CheckoutFormValues,
 } from '../utils/checkout';
+import { trackMetaPixelEvent } from '../utils/metaPixel';
 
 export type ModalTab = 'checkout' | 'details';
 
@@ -51,13 +54,14 @@ export function CheckoutModal({
     address: '',
   });
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
+  const [includeBatidoVerde, setIncludeBatidoVerde] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<{
     combo: ComboOption;
     customer: CheckoutFormValues;
-    message: string;
+    includeBatidoVerde: boolean;
+    totalPrice: number;
     whatsappUrl: string;
   } | null>(null);
-  const [copied, setCopied] = useState(false);
 
   // Sincronizar tab inicial al abrir desde "INVIMA e ingr." o "Comprar"
   const [prevOpenKey, setPrevOpenKey] = useState<string>('');
@@ -67,7 +71,6 @@ export function CheckoutModal({
     if (isOpen) {
       setActiveTab(initialTab);
       setConfirmedOrder(null);
-      setCopied(false);
     }
   }
 
@@ -76,12 +79,30 @@ export function CheckoutModal({
   const selectedCombo =
     COMBO_OPTIONS.find((item) => item.id === selectedComboId) ?? COMBO_OPTIONS[2];
   const savings = getComboSavings(selectedCombo);
+  const totalOrderPrice = calculateOrderTotal(selectedCombo, includeBatidoVerde);
 
   const handleFieldChange = (field: keyof CheckoutFormValues, value: string) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handleToggleBatidoVerde = () => {
+    const nextValue = !includeBatidoVerde;
+    setIncludeBatidoVerde(nextValue);
+
+    setConfirmedOrder((prev) => {
+      if (!prev) return null;
+      const nextTotal = calculateOrderTotal(prev.combo, nextValue);
+      const nextMessage = buildWhatsAppOrderMessage(prev.combo, prev.customer, nextValue);
+      return {
+        ...prev,
+        includeBatidoVerde: nextValue,
+        totalPrice: nextTotal,
+        whatsappUrl: buildWhatsAppUrl(STORE_BRAND.whatsappNumber, nextMessage),
+      };
+    });
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -92,25 +113,26 @@ export function CheckoutModal({
       return;
     }
 
-    const message = buildWhatsAppOrderMessage(selectedCombo, formValues);
+    const message = buildWhatsAppOrderMessage(selectedCombo, formValues, includeBatidoVerde);
     const whatsappUrl = buildWhatsAppUrl(STORE_BRAND.whatsappNumber, message);
+    const totalPrice = calculateOrderTotal(selectedCombo, includeBatidoVerde);
+
+    trackMetaPixelEvent('Lead', {
+      content_name: includeBatidoVerde
+        ? `${selectedCombo.title} + ${BATIDO_VERDE_ADDON.title}`
+        : selectedCombo.title,
+      currency: 'COP',
+      value: totalPrice,
+      num_items: includeBatidoVerde ? 2 : 1,
+    });
+
     setConfirmedOrder({
       combo: selectedCombo,
       customer: { ...formValues },
-      message,
+      includeBatidoVerde,
+      totalPrice,
       whatsappUrl,
     });
-  };
-
-  const handleCopyMessage = async () => {
-    if (!confirmedOrder) return;
-    try {
-      await navigator.clipboard.writeText(confirmedOrder.message);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2200);
-    } catch {
-      setCopied(false);
-    }
   };
 
   return (
@@ -213,24 +235,55 @@ export function CheckoutModal({
                 </div>
               </div>
 
-              {/* Resumen del pedido */}
-              <div className="p-3.5 rounded-2xl bg-zinc-900 border border-white/10 space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">Paquete</span>
-                  <span className="font-semibold text-white">{confirmedOrder.combo.title}</span>
+              {/* Listado completo del pedido */}
+              <div
+                data-testid="order-summary-list"
+                className="p-3.5 rounded-2xl bg-zinc-900 border border-white/10 space-y-2.5 text-xs"
+              >
+                <p className="font-display text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                  Listado de tu pedido
+                </p>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium text-white">
+                      1x Tyruss Full (500g) · {confirmedOrder.combo.title}
+                    </span>
+                    <span className="font-mono-tabular text-zinc-200 shrink-0">
+                      {formatCOP(confirmedOrder.combo.price)}
+                    </span>
+                  </div>
+
+                  {confirmedOrder.includeBatidoVerde && (
+                    <div
+                      data-testid="order-item-batido-verde"
+                      className="flex items-center justify-between gap-2 text-emerald-300"
+                    >
+                      <span className="font-medium">1x {BATIDO_VERDE_ADDON.title}</span>
+                      <span className="font-mono-tabular shrink-0">
+                        +{formatCOP(BATIDO_VERDE_ADDON.price)}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-zinc-400">Bonificación</span>
+                    <span className="font-medium text-emerald-300">
+                      {confirmedOrder.combo.bonusLabel.replace('+ ', '')}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">Total a pagar</span>
-                  <span className="font-mono-tabular font-bold text-cyan-300 text-sm">
-                    {formatCOP(confirmedOrder.combo.price)} COP
+
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                  <span className="font-semibold text-zinc-200">Total a pagar</span>
+                  <span
+                    data-testid="confirmed-total-price"
+                    className="font-mono-tabular font-bold text-cyan-300 text-sm"
+                  >
+                    {formatCOP(confirmedOrder.totalPrice)} COP
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">Bonificación</span>
-                  <span className="font-medium text-emerald-300">
-                    {confirmedOrder.combo.bonusLabel.replace('+ ', '')}
-                  </span>
-                </div>
+
                 <div className="pt-2 border-t border-white/10 space-y-1 text-zinc-300">
                   <p>
                     <strong className="text-white">Cliente:</strong> {confirmedOrder.customer.fullName}
@@ -245,25 +298,57 @@ export function CheckoutModal({
                 </div>
               </div>
 
-              {/* Vista previa del mensaje formateado */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-zinc-400">
-                    Mensaje preparado para WhatsApp
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleCopyMessage}
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-300 hover:text-cyan-200 cursor-pointer"
+              {/* Opción rápida para adicionar o quitar el Batido Verde */}
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={confirmedOrder.includeBatidoVerde}
+                data-testid="confirm-batido-verde-toggle"
+                onClick={handleToggleBatidoVerde}
+                className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
+                  confirmedOrder.includeBatidoVerde
+                    ? 'bg-emerald-950/60 border-emerald-400 shadow-[0_0_0_1px_rgba(52,211,153,0.45)]'
+                    : 'bg-zinc-900/90 border-white/15 hover:border-emerald-400/50'
+                }`}
+              >
+                <div className="flex items-start gap-2.5 min-w-0">
+                  <span
+                    className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
+                      confirmedOrder.includeBatidoVerde
+                        ? 'bg-emerald-400 border-emerald-400 text-slate-950'
+                        : 'bg-zinc-950 border-white/30 text-zinc-400'
+                    }`}
                   >
-                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copiado' : 'Copiar texto'}</span>
-                  </button>
+                    {confirmedOrder.includeBatidoVerde ? (
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    ) : (
+                      <Plus className="w-3.5 h-3.5" />
+                    )}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-display text-xs font-bold text-white">
+                        Adicionar {BATIDO_VERDE_ADDON.title}
+                      </span>
+                      <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300">
+                        Oferta Live
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                      {BATIDO_VERDE_ADDON.subtitle}
+                    </p>
+                  </div>
                 </div>
-                <pre className="p-3 rounded-xl bg-black/70 border border-white/10 text-[11px] text-zinc-200 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto">
-                  {confirmedOrder.message}
-                </pre>
-              </div>
+
+                <div className="text-right shrink-0">
+                  <p className="font-mono-tabular text-xs font-bold text-emerald-300">
+                    +{formatCOP(BATIDO_VERDE_ADDON.price)}
+                  </p>
+                  <p className="font-mono-tabular text-[10px] text-zinc-500 line-through">
+                    {formatCOP(BATIDO_VERDE_ADDON.regularPrice)}
+                  </p>
+                </div>
+              </button>
 
               <div className="flex flex-col gap-2 pt-1">
                 <a
@@ -271,6 +356,16 @@ export function CheckoutModal({
                   target="_blank"
                   rel="noopener noreferrer"
                   data-testid="whatsapp-redirect-link"
+                  onClick={() =>
+                    trackMetaPixelEvent('Purchase', {
+                      content_name: confirmedOrder.includeBatidoVerde
+                        ? `${confirmedOrder.combo.title} + ${BATIDO_VERDE_ADDON.title}`
+                        : confirmedOrder.combo.title,
+                      currency: 'COP',
+                      value: confirmedOrder.totalPrice,
+                      num_items: confirmedOrder.includeBatidoVerde ? 2 : 1,
+                    })
+                  }
                   className="w-full min-h-[48px] px-4 py-2.5 rounded-2xl bg-[#25D366] text-slate-950 font-display text-[13px] font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 hover:brightness-105 active:scale-[0.98] transition-all whitespace-nowrap"
                 >
                   <span>Enviar Pedido por WhatsApp</span>
@@ -430,16 +525,74 @@ export function CheckoutModal({
                 </div>
               </div>
 
-              {/* Resumen dinámico del combo */}
+              {/* Adición opcional: Batido Verde */}
+              <div className="space-y-1.5">
+                <h3 className="font-display text-xs font-bold text-zinc-200">
+                  Adición recomendada en el Live
+                </h3>
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={includeBatidoVerde}
+                  data-testid="addon-batido-verde-toggle"
+                  onClick={handleToggleBatidoVerde}
+                  className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
+                    includeBatidoVerde
+                      ? 'bg-emerald-950/60 border-emerald-400 shadow-[0_0_0_1px_rgba(52,211,153,0.45)]'
+                      : 'bg-zinc-900/90 border-white/10 hover:border-emerald-400/50'
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <span
+                      className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
+                        includeBatidoVerde
+                          ? 'bg-emerald-400 border-emerald-400 text-slate-950'
+                          : 'bg-zinc-950 border-white/30 text-zinc-400'
+                      }`}
+                    >
+                      {includeBatidoVerde ? (
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      ) : (
+                        <Plus className="w-3.5 h-3.5" />
+                      )}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-display text-[12.5px] font-bold text-white">
+                          Agregar {BATIDO_VERDE_ADDON.title}
+                        </span>
+                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300">
+                          Oferta Live
+                        </span>
+                      </div>
+                      <p className="text-[10.5px] text-zinc-400 mt-0.5">
+                        {BATIDO_VERDE_ADDON.subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <p className="font-mono-tabular text-xs font-bold text-emerald-300">
+                      +{formatCOP(BATIDO_VERDE_ADDON.price)}
+                    </p>
+                    <p className="font-mono-tabular text-[10px] text-zinc-500 line-through">
+                      {formatCOP(BATIDO_VERDE_ADDON.regularPrice)}
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Resumen dinámico del combo + adición */}
               <div className="p-3 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-[11px] text-zinc-400">Total seleccionado</p>
                   <p className="font-display text-xs font-bold text-white truncate">
-                    {selectedCombo.title} {selectedCombo.bonusLabel}
+                    {selectedCombo.title}
+                    {includeBatidoVerde ? ' + Batido Verde' : ''} {selectedCombo.bonusLabel}
                   </p>
                   {savings > 0 && (
                     <p className="text-[11px] text-emerald-300 font-medium">
-                      Ahorras {formatCOP(savings)} COP hoy
+                      Ahorras {formatCOP(savings + (includeBatidoVerde ? BATIDO_VERDE_ADDON.regularPrice - BATIDO_VERDE_ADDON.price : 0))} COP hoy
                     </p>
                   )}
                 </div>
@@ -448,7 +601,7 @@ export function CheckoutModal({
                     data-testid="checkout-total-price"
                     className="font-mono-tabular text-base font-extrabold text-cyan-300"
                   >
-                    {formatCOP(selectedCombo.price)} COP
+                    {formatCOP(totalOrderPrice)} COP
                   </span>
                 </div>
               </div>

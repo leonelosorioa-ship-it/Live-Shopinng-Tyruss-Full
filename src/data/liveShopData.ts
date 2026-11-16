@@ -41,6 +41,7 @@ export const STORE_BRAND = {
   logoBlack: '/assets/aistudio/Nuevo_Logo_2026_8261c194.png',
   logoTransparent: '/assets/aistudio/Nuevo_Logo_2026_-_Transparente_438bdc8a.png',
   hostAvatar: '/assets/aistudio/Marie_01293c81.jpeg',
+  liveVideoSrc: '/assets/aistudio/Video_del_Live_de_Mari__4bedd29f.mp4',
 } as const;
 
 export const PRODUCT_INFO = {
@@ -113,6 +114,14 @@ export const COMBO_OPTIONS: ComboOption[] = [
     isVip: true,
   },
 ];
+
+export const BATIDO_VERDE_ADDON = {
+  id: 'addon-batido-verde',
+  title: 'Batido Verde (Linazamix)',
+  subtitle: 'Limpieza digestiva natural antes de Tyruss Full · Oferta Live',
+  price: 15000,
+  regularPrice: 25000,
+} as const;
 
 export const LIVE_SCENES: LiveBroadcastScene[] = [
   {

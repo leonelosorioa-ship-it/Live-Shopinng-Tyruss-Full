@@ -1,130 +1,124 @@
-import { useState } from 'react';
-import { LIVE_SCENES, STORE_BRAND } from '../data/liveShopData';
+import { useEffect, useState, type RefObject } from 'react';
+import { STORE_BRAND } from '../data/liveShopData';
+import { computeRemainingSeconds } from '../utils/liveSession';
 
 interface LiveVideoStageProps {
-  activeSceneIndex: number;
-  onSelectScene: (index: number) => void;
+  videoRef: RefObject<HTMLVideoElement | null>;
+  isMuted: boolean;
+  audioActivated: boolean;
+  liveEnded: boolean;
+  onVideoEnded: () => void;
+  onTimeProgress?: (remainingSeconds: number | null, totalDurationSeconds?: number | null) => void;
 }
 
 export function LiveVideoStage({
-  activeSceneIndex,
-  onSelectScene,
+  videoRef,
+  isMuted,
+  audioActivated,
+  liveEnded,
+  onVideoEnded,
+  onTimeProgress,
 }: LiveVideoStageProps) {
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-  const currentScene = LIVE_SCENES[activeSceneIndex] ?? LIVE_SCENES[0];
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (liveEnded) {
+      video.pause();
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        video.currentTime = Math.max(0, video.duration - 0.05);
+      }
+      onTimeProgress?.(0, Number.isFinite(video.duration) && video.duration > 0 ? video.duration : null);
+      return;
+    }
+
+    video.muted = isMuted;
+    if (video.paused) {
+      video.play().catch(() => {
+        // Algunos navegadores esperan interacción del usuario antes de reproducir con sonido
+      });
+    }
+  }, [isMuted, liveEnded, onTimeProgress, videoRef]);
+
+  const syncRemainingTime = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const totalDuration =
+      Number.isFinite(video.duration) && video.duration > 0 ? video.duration : null;
+    onTimeProgress?.(
+      computeRemainingSeconds(video.duration, video.currentTime, liveEnded, audioActivated),
+      totalDuration
+    );
+  };
+
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (liveEnded) {
+      video.pause();
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        video.currentTime = Math.max(0, video.duration - 0.05);
+      }
+    }
+    syncRemainingTime();
+  };
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-zinc-950 select-none">
-      {/* Resplandor ambiental sutil para tomas de producto */}
+    <div className="absolute inset-0 z-0 overflow-hidden bg-black select-none">
+      {/* Resplandor ambiental de fondo */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(16,185,129,0.22),rgba(6,182,212,0.08)_45%,rgba(0,0,0,0.95)_85%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(16,185,129,0.18),rgba(6,182,212,0.08)_45%,rgba(0,0,0,0.95)_85%)]"
       />
 
-      {/* Capas visuales de transmisión en vivo en bucle */}
-      {LIVE_SCENES.map((scene, index) => {
-        const isActive = index === activeSceneIndex;
-        const hasError = imageErrors[scene.id];
+      {videoError ? (
+        <img
+          src={STORE_BRAND.hostAvatar}
+          alt="Marié presentando Tyruss Full en ColShopi Tienda"
+          referrerPolicy="no-referrer"
+          className="w-full h-full object-cover object-top animate-live-camera"
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          data-testid="live-background-video"
+          src={STORE_BRAND.liveVideoSrc}
+          poster={STORE_BRAND.hostAvatar}
+          autoPlay={!liveEnded}
+          loop={!audioActivated && !liveEnded}
+          playsInline
+          preload="auto"
+          muted={isMuted}
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={syncRemainingTime}
+          onEnded={() => {
+            if (audioActivated) {
+              const video = videoRef.current;
+              const totalDuration =
+                video && Number.isFinite(video.duration) && video.duration > 0
+                  ? video.duration
+                  : null;
+              onTimeProgress?.(0, totalDuration);
+              onVideoEnded();
+            }
+          }}
+          onError={() => setVideoError(true)}
+          aria-label="Transmisión en vivo de Marié presentando Tyruss Full en ColShopi Tienda"
+          className="w-full h-full object-cover object-center"
+        />
+      )}
 
-        return (
-          <div
-            key={scene.id}
-            className={`absolute inset-0 transition-opacity duration-700 ease-out flex items-center justify-center ${
-              isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-          >
-            {hasError ? (
-              <div className="w-full h-full bg-gradient-to-br from-emerald-950 via-zinc-900 to-cyan-950 flex items-center justify-center p-8 text-center">
-                <p className="font-display text-lg font-semibold text-white/80">
-                  {scene.speaker}
-                </p>
-              </div>
-            ) : index === 0 ? (
-              <img
-                src={scene.imageSrc}
-                alt={scene.imageAlt}
-                referrerPolicy="no-referrer"
-                onError={() => setImageErrors((prev) => ({ ...prev, [scene.id]: true }))}
-                className="w-full h-full object-cover object-top animate-live-camera"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center px-6 pt-24 pb-44">
-                <img
-                  src={scene.imageSrc}
-                  alt={scene.imageAlt}
-                  referrerPolicy="no-referrer"
-                  onError={() => setImageErrors((prev) => ({ ...prev, [scene.id]: true }))}
-                  className="max-h-full w-auto object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.85)] animate-live-camera"
-                />
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Degradados de contraste para legibilidad de UI sobre video */}
+      {/* Degradados suaves solo en bordes superior e inferior para mantener legible la UI sobre el video */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/90 pointer-events-none"
+        className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/70 via-black/30 to-transparent pointer-events-none"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/95 via-black/55 to-transparent pointer-events-none"
+        className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-black/92 via-black/45 to-transparent pointer-events-none"
       />
-
-      {/* Placa corporativa compacta de Marié para dejar mayor espacio libre al video */}
-      <div className="absolute top-[84px] inset-x-3 z-10 flex flex-col gap-1 pointer-events-auto">
-        <div className="px-2.5 py-1.5 rounded-xl bg-black/50 backdrop-blur-md border border-white/10 shadow-md">
-          <div className="flex items-center gap-2 min-w-0">
-            <img
-              src={STORE_BRAND.hostAvatar}
-              alt={STORE_BRAND.hostName}
-              referrerPolicy="no-referrer"
-              className="w-7 h-7 rounded-full object-cover object-top border border-cyan-300/60 shrink-0"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10.5px] font-bold text-cyan-300 whitespace-nowrap">
-                  {currentScene.speaker}
-                </span>
-                <span aria-hidden="true" className="text-white/30 text-[10px]">
-                  ·
-                </span>
-                <span className="text-[10px] text-emerald-300 font-medium truncate">
-                  {currentScene.highlight}
-                </span>
-              </div>
-              <p className="text-[10.5px] leading-tight text-white/95 truncate mt-0.5">
-                {currentScene.caption}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Selector discreto de tomas del Live */}
-        <div
-          className="flex items-center justify-center gap-1"
-          role="tablist"
-          aria-label="Escenas de la transmisión"
-        >
-          {LIVE_SCENES.map((scene, index) => {
-            const active = index === activeSceneIndex;
-            return (
-              <button
-                key={scene.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                aria-label={`Ver escena ${index + 1}: ${scene.speaker}`}
-                onClick={() => onSelectScene(index)}
-                className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
-                  active ? 'w-5 bg-cyan-400' : 'w-1.5 bg-white/35 hover:bg-white/60'
-                }`}
-              />
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
