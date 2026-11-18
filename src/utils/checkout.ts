@@ -91,7 +91,7 @@ export function buildWhatsAppOrderMessage(
     '👋 ¡Hola Marié! Quiero confirmar mi pedido del Live:',
     '',
     `📦 *Producto:* Tyruss Full (500g) — ${combo.title}`,
-    `🎁 *Obsequio incluido:* ${GIFT_ADDON.title} — Valor agregado GRATIS (${formatCOP(GIFT_ADDON.price)} COP)`,
+    `🎁 *Obsequio incluido:* ${GIFT_ADDON.title} — GRATIS (${formatCOP(GIFT_ADDON.price)} COP)`,
     ...(includeBatidoVerde
       ? [`🥗 *Adición:* ${BATIDO_VERDE_ADDON.title} (+${formatCOP(BATIDO_VERDE_ADDON.price)} COP)`]
       : []),

@@ -259,10 +259,7 @@ export function CheckoutModal({
                     data-testid="order-item-locion-termica"
                     className="flex items-center justify-between gap-2 text-amber-200"
                   >
-                    <span className="font-medium">
-                      1x {GIFT_ADDON.title}{' '}
-                      <span className="text-[10px] text-amber-300/90">(Valor agregado)</span>
-                    </span>
+                    <span className="font-medium">1x {GIFT_ADDON.title}</span>
                     <span className="font-mono-tabular font-bold text-emerald-300 shrink-0">
                       GRATIS ({formatCOP(GIFT_ADDON.price)})
                     </span>
@@ -539,7 +536,7 @@ export function CheckoutModal({
                 </div>
               </div>
 
-              {/* Item predeterminado incluido como valor agregado: Loción Térmica (Obsequio) */}
+              {/* Item predeterminado incluido gratis: Loción Térmica (Obsequio) */}
               <div className="space-y-1.5">
                 <h3 className="font-display text-xs font-bold text-zinc-200">
                   Obsequio predeterminado incluido en tu pedido
@@ -556,14 +553,9 @@ export function CheckoutModal({
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </span>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-display text-[12.5px] font-bold text-white">
-                          {GIFT_ADDON.title}
-                        </span>
-                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200">
-                          Valor agregado
-                        </span>
-                      </div>
+                      <span className="block font-display text-[12.5px] font-bold text-white">
+                        {GIFT_ADDON.title}
+                      </span>
                       <p className="text-[10.5px] text-amber-100/80 mt-0.5">
                         {GIFT_ADDON.subtitle}
                       </p>
