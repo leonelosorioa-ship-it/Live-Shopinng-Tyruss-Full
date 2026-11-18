@@ -13,6 +13,7 @@ import {
 import {
   BATIDO_VERDE_ADDON,
   COMBO_OPTIONS,
+  GIFT_ADDON,
   PRODUCT_INFO,
   STORE_BRAND,
   type ComboOption,
@@ -251,6 +252,19 @@ export function CheckoutModal({
                     </span>
                     <span className="font-mono-tabular text-zinc-200 shrink-0">
                       {formatCOP(confirmedOrder.combo.price)}
+                    </span>
+                  </div>
+
+                  <div
+                    data-testid="order-item-locion-termica"
+                    className="flex items-center justify-between gap-2 text-amber-200"
+                  >
+                    <span className="font-medium">
+                      1x {GIFT_ADDON.title}{' '}
+                      <span className="text-[10px] text-amber-300/90">(Valor agregado)</span>
+                    </span>
+                    <span className="font-mono-tabular font-bold text-emerald-300 shrink-0">
+                      GRATIS ({formatCOP(GIFT_ADDON.price)})
                     </span>
                   </div>
 
@@ -525,6 +539,48 @@ export function CheckoutModal({
                 </div>
               </div>
 
+              {/* Item predeterminado incluido como valor agregado: Loción Térmica (Obsequio) */}
+              <div className="space-y-1.5">
+                <h3 className="font-display text-xs font-bold text-zinc-200">
+                  Obsequio predeterminado incluido en tu pedido
+                </h3>
+                <div
+                  data-testid="gift-locion-termica-card"
+                  className="w-full p-3 rounded-2xl border bg-amber-950/35 border-amber-400/55 shadow-[0_0_0_1px_rgba(251,191,36,0.22)] flex items-center justify-between gap-2.5"
+                >
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <span
+                      aria-hidden="true"
+                      className="mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-amber-400 text-slate-950"
+                    >
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-display text-[12.5px] font-bold text-white">
+                          {GIFT_ADDON.title}
+                        </span>
+                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200">
+                          Valor agregado
+                        </span>
+                      </div>
+                      <p className="text-[10.5px] text-amber-100/80 mt-0.5">
+                        {GIFT_ADDON.subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <p className="font-mono-tabular text-xs font-extrabold text-emerald-300">
+                      GRATIS
+                    </p>
+                    <p className="font-mono-tabular text-[10px] text-zinc-400">
+                      {formatCOP(GIFT_ADDON.price)} COP
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Adición opcional: Batido Verde */}
               <div className="space-y-1.5">
                 <h3 className="font-display text-xs font-bold text-zinc-200">
@@ -582,19 +638,20 @@ export function CheckoutModal({
                 </button>
               </div>
 
-              {/* Resumen dinámico del combo + adición */}
+              {/* Resumen dinámico del combo + obsequio + adición */}
               <div className="p-3 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-[11px] text-zinc-400">Total seleccionado</p>
                   <p className="font-display text-xs font-bold text-white truncate">
-                    {selectedCombo.title}
-                    {includeBatidoVerde ? ' + Batido Verde' : ''} {selectedCombo.bonusLabel}
+                    {selectedCombo.title} + {GIFT_ADDON.title}
+                    {includeBatidoVerde ? ' + Batido Verde' : ''}
                   </p>
-                  {savings > 0 && (
-                    <p className="text-[11px] text-emerald-300 font-medium">
-                      Ahorras {formatCOP(savings + (includeBatidoVerde ? BATIDO_VERDE_ADDON.regularPrice - BATIDO_VERDE_ADDON.price : 0))} COP hoy
-                    </p>
-                  )}
+                  <p className="text-[11px] text-emerald-300 font-medium truncate">
+                    Incluye {selectedCombo.bonusLabel.replace('+ ', '')}
+                    {savings > 0
+                      ? ` · Ahorras ${formatCOP(savings + (includeBatidoVerde ? BATIDO_VERDE_ADDON.regularPrice - BATIDO_VERDE_ADDON.price : 0))} COP`
+                      : ''}
+                  </p>
                 </div>
                 <div className="text-right shrink-0">
                   <span

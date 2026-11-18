@@ -64,6 +64,10 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="share-modal-title"
+      data-testid="share-modal"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       className="absolute inset-0 z-40 flex items-end justify-center bg-black/75 backdrop-blur-sm"
     >
       <div className="w-full rounded-t-3xl bg-zinc-950 border-t border-x border-white/15 p-4 pb-6 shadow-2xl space-y-4">
@@ -94,6 +98,7 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
             href={links.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
+            data-testid="share-whatsapp-link"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-zinc-900 border border-white/10 hover:border-[#25D366]/60 transition-colors"
           >
             <span className="w-10 h-10 rounded-full bg-[#25D366] text-slate-950 flex items-center justify-center font-bold text-xs">
@@ -106,6 +111,7 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
             href={links.facebook}
             target="_blank"
             rel="noopener noreferrer"
+            data-testid="share-facebook-link"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-zinc-900 border border-white/10 hover:border-[#1877F2]/60 transition-colors"
           >
             <span className="w-10 h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-bold text-sm">
@@ -118,6 +124,7 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
             href={links.x}
             target="_blank"
             rel="noopener noreferrer"
+            data-testid="share-x-link"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-zinc-900 border border-white/10 hover:border-white/40 transition-colors"
           >
             <span className="w-10 h-10 rounded-full bg-zinc-800 border border-white/20 text-white flex items-center justify-center font-bold text-sm">
@@ -130,6 +137,7 @@ export function ShareModal({ isOpen, onClose }: ShareModalProps) {
             href={links.telegram}
             target="_blank"
             rel="noopener noreferrer"
+            data-testid="share-telegram-link"
             className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-zinc-900 border border-white/10 hover:border-[#229ED9]/60 transition-colors"
           >
             <span className="w-10 h-10 rounded-full bg-[#229ED9] text-white flex items-center justify-center font-bold text-xs">

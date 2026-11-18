@@ -16,6 +16,7 @@ export interface FloatingHeartParticle {
 
 interface LiveFooterBarProps {
   onOpenCheckout: () => void;
+  onOpenShare: () => void;
   onSendComment: (text: string) => void;
   onLike: (kind?: 'heart' | 'like') => void;
   floatingHearts: FloatingHeartParticle[];
@@ -25,6 +26,7 @@ interface LiveFooterBarProps {
 
 export function LiveFooterBar({
   onOpenCheckout,
+  onOpenShare,
   onSendComment,
   onLike,
   floatingHearts,
@@ -109,14 +111,16 @@ export function LiveFooterBar({
           </button>
         </form>
 
-        <div
+        <button
+          type="button"
+          onClick={onOpenShare}
           data-testid="share-live-btn"
-          aria-hidden="true"
-          className="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[34px] px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-600/80 to-cyan-500/80 border border-white/20 text-white/95 font-display text-[11px] font-bold shadow-[0_4px_14px_rgba(217,70,239,0.22)] whitespace-nowrap select-none pointer-events-none"
+          aria-label="Compartir Live en WhatsApp y redes sociales"
+          className="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[34px] px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-600/90 to-cyan-500/90 border border-white/25 text-white font-display text-[11px] font-bold shadow-[0_4px_14px_rgba(217,70,239,0.35)] hover:brightness-110 active:scale-95 transition-all cursor-pointer whitespace-nowrap animate-live-btn-pulse"
         >
           <Share2 className="w-3.5 h-3.5 shrink-0" />
           <span>Compartir</span>
-        </div>
+        </button>
       </div>
 
       {/* Barra principal de acciones en zona natural del pulgar */}

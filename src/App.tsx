@@ -11,6 +11,7 @@ import { LiveHeader } from './components/LiveHeader';
 import { LiveChatFeed } from './components/LiveChatFeed';
 import { LiveFooterBar, type FloatingHeartParticle } from './components/LiveFooterBar';
 import { CheckoutModal, type ModalTab } from './components/CheckoutModal';
+import { ShareModal } from './components/ShareModal';
 import { LiveEndedOverlay } from './components/LiveEndedOverlay';
 import { liveAudio } from './utils/liveAudio';
 import {
@@ -62,6 +63,7 @@ export default function App() {
     open: false,
     tab: 'checkout',
   });
+  const [shareOpen, setShareOpen] = useState<boolean>(false);
 
   // Evitar aviso de instalación de app y facilitar colapso de barra URL en móvil sin Fullscreen API
   useEffect(() => {
@@ -381,6 +383,7 @@ export default function App() {
             });
             setModalState({ open: true, tab: 'checkout' });
           }}
+          onOpenShare={() => setShareOpen(true)}
           onSendComment={handleSendComment}
           onLike={handleLike}
           floatingHearts={floatingHearts}
@@ -471,6 +474,9 @@ export default function App() {
             }}
           />
         )}
+
+        {/* Modal para compartir en WhatsApp y redes sociales */}
+        <ShareModal isOpen={shareOpen} onClose={() => setShareOpen(false)} />
 
         {/* Modal de Checkout, Combos e Ingredientes */}
         <CheckoutModal

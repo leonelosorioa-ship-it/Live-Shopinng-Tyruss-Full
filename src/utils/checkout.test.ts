@@ -71,6 +71,7 @@ test('buildWhatsAppOrderMessage includes combo, price, TyroFem bonus, and custom
 
   assert.match(message, /ColShopi Tienda/i);
   assert.match(message, /Pague 3 Lleve 5 Tarros/);
+  assert.match(message, /Loción Térmica \(Obsequio\)/);
   assert.match(message, /\$269\.700 COP/);
   assert.match(message, /App TyroFem 30D VIP/);
   assert.match(message, /Laura Gómez/);
@@ -99,6 +100,7 @@ test('calculateOrderTotal and WhatsApp message include optional Batido Verde whe
     true
   );
 
+  assert.match(messageWithAddon, /Loción Térmica \(Obsequio\)/);
   assert.match(messageWithAddon, /Batido Verde \(Linazamix\)/);
   assert.match(messageWithAddon, /\$194\.800 COP/);
 });

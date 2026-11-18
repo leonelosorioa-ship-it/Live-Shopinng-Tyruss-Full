@@ -123,6 +123,14 @@ export const BATIDO_VERDE_ADDON = {
   regularPrice: 25000,
 } as const;
 
+export const GIFT_ADDON = {
+  id: 'gift-locion-termica',
+  title: 'Loción Térmica (Obsequio)',
+  subtitle: 'Valor agregado incluido gratis en tu pedido',
+  badge: 'Obsequio',
+  price: 0,
+} as const;
+
 export const LIVE_SCENES: LiveBroadcastScene[] = [
   {
     id: 'scene-host',

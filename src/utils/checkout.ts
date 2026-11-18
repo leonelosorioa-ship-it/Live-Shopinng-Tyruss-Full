@@ -1,4 +1,4 @@
-import { BATIDO_VERDE_ADDON, type ComboOption } from '../data/liveShopData';
+import { BATIDO_VERDE_ADDON, GIFT_ADDON, type ComboOption } from '../data/liveShopData';
 
 export interface CheckoutFormValues {
   fullName: string;
@@ -91,11 +91,12 @@ export function buildWhatsAppOrderMessage(
     '👋 ¡Hola Marié! Quiero confirmar mi pedido del Live:',
     '',
     `📦 *Producto:* Tyruss Full (500g) — ${combo.title}`,
+    `🎁 *Obsequio incluido:* ${GIFT_ADDON.title} — Valor agregado GRATIS (${formatCOP(GIFT_ADDON.price)} COP)`,
     ...(includeBatidoVerde
       ? [`🥗 *Adición:* ${BATIDO_VERDE_ADDON.title} (+${formatCOP(BATIDO_VERDE_ADDON.price)} COP)`]
       : []),
     `💰 *Valor Total:* ${formatCOP(totalAmount)} COP`,
-    `🎁 *Bonificación:* ${bonusText}`,
+    `✨ *Bonificación:* ${bonusText}`,
     '🚚 *Modalidad:* Envío nacional / Pago contra entrega',
     '',
     '👤 *DATOS DE ENTREGA:*',
