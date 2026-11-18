@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Play, Sparkles, Volume2 } from 'lucide-react';
+import { MousePointerClick, Play, Sparkles, Volume2 } from 'lucide-react';
 import {
   COMBO_OPTIONS,
   INITIAL_CHAT_MESSAGES,
@@ -388,24 +388,49 @@ export default function App() {
           remainingProducts={remainingProducts}
         />
 
-        {/* Capa flotante inicial para activar el sonido del Live (encima de tarjetas y chat) */}
+        {/* Capa flotante inicial interactiva para activar el sonido e iniciar el Live */}
         {!audioActivated && !liveEnded && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/65 backdrop-blur-sm px-6">
+          <div
+            onClick={(e) => {
+              if (e.target === e.currentTarget) handleActivateAudio();
+            }}
+            className="absolute inset-0 z-30 flex items-center justify-center bg-black/62 backdrop-blur-[4px] px-6 cursor-pointer"
+          >
             <button
               type="button"
               onClick={handleActivateAudio}
               data-testid="activate-audio-btn"
-              className="group w-full max-w-[300px] flex flex-col items-center gap-3.5 p-6 rounded-3xl bg-zinc-950/95 border border-cyan-400/45 shadow-[0_24px_60px_rgba(0,0,0,0.9)] hover:border-cyan-300 active:scale-[0.98] transition-all cursor-pointer"
+              className="group relative w-full max-w-[310px] flex flex-col items-center gap-4 p-6 rounded-3xl bg-zinc-950/92 border border-emerald-400/55 hover:border-cyan-300 hover:scale-[1.02] active:scale-[0.97] transition-all cursor-pointer animate-entry-glow"
             >
-              <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-emerald-400 text-slate-950 shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform">
-                <Volume2 className="w-7 h-7" />
-                <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center border-2 border-zinc-950">
-                  <Play className="w-3 h-3 fill-white ml-0.5" />
+              {/* Indicador vivo arriba de la tarjeta */}
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/45 text-[10.5px] font-bold tracking-wide text-rose-200">
+                <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-85" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
                 </span>
+                EN VIVO AHORA · {viewerCount} conectadas
+              </span>
+
+              {/* Ícono central con ondas concéntricas pulsantes */}
+              <div className="relative flex items-center justify-center my-1">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full border-2 border-cyan-400/60 animate-entry-ripple pointer-events-none"
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full border-2 border-emerald-400/50 animate-entry-ripple-delayed pointer-events-none"
+                />
+                <div className="relative flex items-center justify-center w-18 h-18 rounded-full bg-gradient-to-br from-cyan-400 via-teal-300 to-emerald-400 text-slate-950 shadow-[0_0_24px_rgba(34,211,238,0.45)] group-hover:scale-105 transition-transform">
+                  <Volume2 className="w-8 h-8" />
+                  <span className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center border-2 border-zinc-950 shadow-md">
+                    <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                  </span>
+                </div>
               </div>
 
               <div className="text-center space-y-1.5">
-                <p className="font-display text-[17px] font-bold text-white leading-snug text-balance">
+                <p className="font-display text-[17.5px] font-extrabold text-white leading-snug text-balance">
                   Toca para activar el sonido del Live
                 </p>
                 <p className="text-xs text-zinc-300 leading-relaxed text-balance">
@@ -414,10 +439,17 @@ export default function App() {
                 </p>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white text-slate-950 text-xs font-extrabold tracking-wide">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                Entrar al Live Shop
-              </span>
+              {/* Botón CTA pulsante que invita al clic */}
+              <div className="w-full space-y-1.5">
+                <span className="w-full min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 text-slate-950 font-display text-[11.5px] sm:text-[12px] font-extrabold tracking-tight whitespace-nowrap shadow-[0_8px_24px_rgba(16,185,129,0.4)] animate-cta-pulse">
+                  <Sparkles className="w-3.5 h-3.5 text-slate-900 shrink-0" />
+                  <span>Toca aquí para iniciar el Live</span>
+                  <MousePointerClick className="w-3.5 h-3.5 text-slate-900 shrink-0 animate-tap-nudge" />
+                </span>
+                <p className="text-[10.5px] font-medium text-cyan-200/85">
+                  Activa audio y video en tiempo real
+                </p>
+              </div>
             </button>
           </div>
         )}

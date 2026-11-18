@@ -176,6 +176,57 @@
   will-change: transform;
 }
 
+/* Animaciones de invitación e interacción para la tarjeta inicial del Live */
+@keyframes entryRippleOut {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.72;
+  }
+  100% {
+    transform: scale(1.68);
+    opacity: 0;
+  }
+}
+
+.animate-entry-ripple {
+  animation: entryRippleOut 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  will-change: transform, opacity;
+}
+
+.animate-entry-ripple-delayed {
+  animation: entryRippleOut 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.9s infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes entryCardGlow {
+  0%,
+  100% {
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.92), 0 0 22px rgba(34, 211, 238, 0.22);
+  }
+  50% {
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.92), 0 0 38px rgba(16, 185, 129, 0.42);
+  }
+}
+
+.animate-entry-glow {
+  animation: entryCardGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes tapNudge {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3px, -2px, 0) scale(1.12);
+  }
+}
+
+.animate-tap-nudge {
+  animation: tapNudge 1.15s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* Ocultar scrollbar en chat y modal manteniendo usabilidad táctil */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -191,7 +242,11 @@
   .animate-live-pulse,
   .animate-live-btn-pulse,
   .animate-cta-pulse,
-  .animate-cta-haptic {
+  .animate-cta-haptic,
+  .animate-entry-ripple,
+  .animate-entry-ripple-delayed,
+  .animate-entry-glow,
+  .animate-tap-nudge {
     animation: none !important;
   }
 }
