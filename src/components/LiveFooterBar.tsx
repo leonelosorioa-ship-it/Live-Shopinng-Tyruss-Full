@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Flame, Heart, MessageCircle, Send, Share2, ShoppingCart, ThumbsUp } from 'lucide-react';
-import {
-  CART_DEMAND_CAPACITY,
-  computeCartDemandPercent,
-  formatRemainingProductsLabel,
-} from '../utils/liveSession';
+import { formatRemainingProductsLabel } from '../utils/liveSession';
 
 export interface FloatingHeartParticle {
   id: number;
@@ -20,7 +16,6 @@ interface LiveFooterBarProps {
   onSendComment: (text: string) => void;
   onLike: (kind?: 'heart' | 'like') => void;
   floatingHearts: FloatingHeartParticle[];
-  cartDemandCount: number;
   remainingProducts: number;
 }
 
@@ -30,10 +25,8 @@ export function LiveFooterBar({
   onSendComment,
   onLike,
   floatingHearts,
-  cartDemandCount,
   remainingProducts,
 }: LiveFooterBarProps) {
-  const demandPercent = computeCartDemandPercent(cartDemandCount, CART_DEMAND_CAPACITY);
   const [commentText, setCommentText] = useState('');
   const [isBuyHaptic, setIsBuyHaptic] = useState(false);
   const openTimerRef = useRef<number | null>(null);
@@ -116,7 +109,7 @@ export function LiveFooterBar({
           onClick={onOpenShare}
           data-testid="share-live-btn"
           aria-label="Compartir Live en WhatsApp y redes sociales"
-          className="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[34px] px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-600/90 to-cyan-500/90 border border-white/25 text-white font-display text-[11px] font-bold shadow-[0_4px_14px_rgba(217,70,239,0.28)] hover:brightness-110 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+          className="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[34px] px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-600/90 to-cyan-500/90 border border-white/25 text-white font-display text-[11px] font-bold shadow-[0_4px_14px_rgba(217,70,239,0.35)] hover:brightness-110 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
         >
           <Share2 className="w-3.5 h-3.5 shrink-0" />
           <span>Compartir</span>
@@ -188,7 +181,7 @@ export function LiveFooterBar({
               onClick={() => onLike('heart')}
               data-testid="footer-like-btn"
               aria-label="Enviar corazón en el Live"
-              className="inline-flex items-center justify-center w-[42px] h-[42px] rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-400 hover:bg-rose-500/30 active:scale-90 transition-all cursor-pointer animate-live-btn-pulse"
+              className="inline-flex items-center justify-center w-[42px] h-[42px] rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-400 hover:bg-rose-500/30 active:scale-90 transition-all cursor-pointer"
             >
               <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
             </button>
@@ -200,41 +193,10 @@ export function LiveFooterBar({
             onClick={() => onLike('like')}
             data-testid="footer-thumbsup-btn"
             aria-label="Dar Me gusta al Live"
-            className="shrink-0 inline-flex items-center justify-center w-[42px] h-[42px] rounded-full bg-sky-500/20 border border-sky-400/45 text-sky-300 hover:bg-sky-500/30 active:scale-90 transition-all cursor-pointer animate-live-btn-pulse"
+            className="shrink-0 inline-flex items-center justify-center w-[42px] h-[42px] rounded-full bg-sky-500/20 border border-sky-400/45 text-sky-300 hover:bg-sky-500/30 active:scale-90 transition-all cursor-pointer"
           >
             <ThumbsUp className="w-4 h-4 fill-sky-400 text-sky-400" />
           </button>
-        </div>
-      </div>
-
-      {/* Barra delgada inferior de alta demanda según personas agregando al carrito */}
-      <div data-testid="cart-demand-container" className="pt-0.5 space-y-1">
-        <div className="flex items-center justify-between gap-2 text-[10.5px] leading-none">
-          <span className="text-zinc-300 truncate">
-            <strong className="font-mono-tabular font-bold text-amber-300">
-              {cartDemandCount}
-            </strong>{' '}
-            personas agregaron al carrito
-          </span>
-          <span className="font-mono-tabular font-bold text-emerald-300 shrink-0">
-            {demandPercent}% pedido
-          </span>
-        </div>
-
-        <div
-          role="progressbar"
-          data-testid="cart-demand-bar"
-          aria-label="Demanda de productos agregados al carrito"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={demandPercent}
-          className="w-full h-1.5 rounded-full bg-white/15 overflow-hidden"
-        >
-          <div
-            data-testid="cart-demand-fill"
-            style={{ width: `${demandPercent}%` }}
-            className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-[width] duration-700 ease-out"
-          />
         </div>
       </div>
     </footer>

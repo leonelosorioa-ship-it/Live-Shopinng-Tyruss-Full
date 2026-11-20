@@ -9,7 +9,6 @@ import {
 import { LiveVideoStage } from './components/LiveVideoStage';
 import { LiveHeader } from './components/LiveHeader';
 import { LiveChatFeed } from './components/LiveChatFeed';
-import { LiveTestimonialsCarousel } from './components/LiveTestimonialsCarousel';
 import { LiveFooterBar, type FloatingHeartParticle } from './components/LiveFooterBar';
 import { CheckoutModal, type ModalTab } from './components/CheckoutModal';
 import { ShareModal } from './components/ShareModal';
@@ -22,7 +21,6 @@ import {
   getNextUrgencyDelayMs,
   hasFinishedLiveInSession,
   markLiveFinishedInSession,
-  nextCartDemandCount,
   nextUrgencyStockCount,
 } from './utils/liveSession';
 import { trackMetaPixelEvent } from './utils/metaPixel';
@@ -45,7 +43,6 @@ export default function App() {
 
   const [viewerCount, setViewerCount] = useState<number>(612);
   const [likesCount, setLikesCount] = useState<number>(4844);
-  const [cartDemandCount, setCartDemandCount] = useState<number>(72);
   const [remainingProducts, setRemainingProducts] = useState<number>(() =>
     hasFinishedLiveInSession() ? FINAL_URGENCY_STOCK : INITIAL_URGENCY_STOCK
   );
@@ -103,15 +100,6 @@ export default function App() {
     }, 3600);
     return () => window.clearInterval(timer);
   }, []);
-
-  // Incremento orgánico de personas agregando productos al carrito durante el Live
-  useEffect(() => {
-    if (liveEnded) return;
-    const timer = window.setInterval(() => {
-      setCartDemandCount((prev) => nextCartDemandCount(prev));
-    }, 8500);
-    return () => window.clearInterval(timer);
-  }, [liveEnded]);
 
   // Reducción aleatoria de unidades disponibles (de 125 a 16 al terminar el Live)
   useEffect(() => {
@@ -345,19 +333,28 @@ export default function App() {
     };
     setChatMessages((prev) => [...prev.slice(-18), userMessage]);
 
-    // Respuesta automática contextual de Marié para preguntas del espectador
+    // Respuesta automática contextual de Marié para cada comentario o testimonio
     const lower = text.toLowerCase();
     let replyText =
-      '¡Gracias por conectarte! Toca "Comprar Tyruss Full + App Gratis" abajo para pedir tu combo con envío nacional.';
+      '¡Gracias por escribirnos! Toca "Comprar Tyruss Full + App Gratis" abajo para pedir tu combo con Loción Térmica de obsequio y envío nacional.';
     if (lower.includes('precio') || lower.includes('vale') || lower.includes('cuesta')) {
       replyText =
-        'Desde $89.900 (1 tarro) y el favorito Pague 2 Lleve 3 Tarros en $179.800 con App TyroFem 30D gratis.';
+        'Desde $89.900 (1 tarro) y el favorito Pague 2 Lleve 3 Tarros en $179.800 con App TyroFem 30D y Loción Térmica de obsequio.';
     } else if (lower.includes('env') || lower.includes('contra') || lower.includes('ciudad') || lower.includes('medell') || lower.includes('bogot')) {
       replyText =
         '¡Sí! Hacemos envíos a toda Colombia y manejamos pago contra entrega en la mayoría de ciudades.';
     } else if (lower.includes('app') || lower.includes('tyrofem')) {
       replyText =
         'Con cualquier combo recibes acceso 100% gratis a la App TyroFem 30D apenas confirmas tu pedido por WhatsApp.';
+    } else if (lower.includes('locion') || lower.includes('loción') || lower.includes('obsequio') || lower.includes('regalo')) {
+      replyText =
+        '¡Así es! Con tu pedido de hoy en el Live te enviamos la Loción Térmica de obsequio totalmente gratis.';
+    } else if (lower.includes('batido') || lower.includes('linaza')) {
+      replyText =
+        'El Batido Verde (Linazamix) puedes adicionarlo en tu pedido por solo +$15.000 con precio exclusivo del Live.';
+    } else if (lower.includes('funciona') || lower.includes('sirve') || lower.includes('testimonio') || lower.includes('resultado')) {
+      replyText =
+        '¡Sí funciona muchísimo! Nuestras clientas notan más energía, mejor digestión y menos ansiedad desde las primeras semanas de uso constante.';
     }
 
     window.setTimeout(() => {
@@ -450,14 +447,12 @@ export default function App() {
             </div>
           )}
 
-          <LiveTestimonialsCarousel paused={liveEnded || modalState.open || shareOpen} />
           <LiveChatFeed messages={chatMessages} />
         </div>
 
         {/* Capa 4: Barra inferior de acciones (Thumb zone) */}
         <LiveFooterBar
           onOpenCheckout={() => {
-            setCartDemandCount((prev) => nextCartDemandCount(prev));
             const activeCombo =
               COMBO_OPTIONS.find((item) => item.id === selectedComboId) ?? defaultCombo;
             trackMetaPixelEvent('InitiateCheckout', {
@@ -472,7 +467,6 @@ export default function App() {
           onSendComment={handleSendComment}
           onLike={handleLike}
           floatingHearts={floatingHearts}
-          cartDemandCount={cartDemandCount}
           remainingProducts={remainingProducts}
         />
 

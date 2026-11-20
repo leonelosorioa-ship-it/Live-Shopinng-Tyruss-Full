@@ -168,7 +168,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   {
     id: 'init-1',
     author: 'Marié',
-    text: '¡Hola a todas! Activen el sonido arriba si acaban de entrar. Hoy tenemos combos especiales de Tyruss Full + App TyroFem 30D gratis.',
+    text: '¡Hola a todas! Hoy tenemos combos especiales de Tyruss Full + App TyroFem 30D y Loción Térmica de obsequio.',
     isHost: true,
     timestamp: 'Ahora',
   },
@@ -176,58 +176,88 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     id: 'init-2',
     author: 'Camila R.',
     city: 'Medellín',
-    text: 'Yo llevo el segundo tarro y la energía en las mañanas se siente muchísimo, súper rico con leche de almendras.',
+    text: 'Yo ya voy por mi segundo tarro y la energía en las mañanas se siente muchísimo, además me desinflamó súper rápido.',
     timestamp: 'Ahora',
   },
   {
     id: 'init-3',
-    author: 'Valentina M.',
-    city: 'Bogotá',
-    text: '¿Tienen pago contra entrega en Bogotá para el combo Pague 2 Lleve 3?',
+    author: 'Marié',
+    text: '¡Qué alegría leerte Camila! Cuando se toma constante cada mañana los resultados en energía y bienestar se notan muchísimo.',
+    isHost: true,
     timestamp: 'Ahora',
   },
 ];
 
 export const SIMULATED_CHAT_QUEUE: Omit<ChatMessage, 'id' | 'timestamp'>[] = [
   {
+    author: 'Valentina M.',
+    city: 'Bogotá',
+    text: '¿Tienen pago contra entrega en Bogotá para el combo Pague 2 Lleve 3?',
+  },
+  {
     author: 'Marié',
     text: '¡Sí Valentina! Enviamos con pago contra entrega a Bogotá, Medellín, Cali, Barranquilla y casi todo el país.',
     isHost: true,
   },
   {
-    author: 'Paola Andrea',
+    author: 'Andrea Ospina',
     city: 'Cali',
-    text: '¿Tiene azúcar añadida o soya? Es que me cuido bastante.',
-    },
+    text: 'Chicas súper recomendado, llevo 3 semanas tomándolo con el Batido Verde y bajé la pesadez abdominal, me siento más liviana todo el día.',
+  },
   {
     author: 'Marié',
-    text: 'Cero soya, cero maltodextrina y sin azúcares añadidos. Tiene espirulina, clorofila, crema de coco y omega 3.',
+    text: '¡Gracias por compartir tu experiencia Andrea! Combinar Tyruss Full con el Batido Verde potencia muchísimo la digestión.',
+    isHost: true,
+  },
+  {
+    author: 'Paola Andrea',
+    city: 'Manizales',
+    text: '¿Tiene azúcar añadida o soya? Es que me cuido bastante.',
+  },
+  {
+    author: 'Marié',
+    text: 'Cero soya, cero maltodextrina y sin azúcares añadidos Paola. Tiene espirulina, clorofila, crema de coco y omega 3.',
+    isHost: true,
+  },
+  {
+    author: 'Marcela Gómez',
+    city: 'Barranquilla',
+    text: 'A mí me llegó en 2 días a Barranquilla súper bien empacado, el sabor es delicioso y la App TyroFem 30D me ha ayudado un montón con mis comidas.',
+  },
+  {
+    author: 'Marié',
+    text: '¡Me encanta saber que ya lo estás disfrutando Marcela! La App TyroFem 30D es el complemento ideal para lograr resultados reales.',
     isHost: true,
   },
   {
     author: 'Natalia G.',
-    city: 'Barranquilla',
-    text: 'Acabo de pedir el Pague 2 Lleve 3, ¿cómo recibo la App TyroFem 30D?',
-  },
-  {
-    author: 'Diana Marcela',
     city: 'Bucaramanga',
-    text: '¿Cuánto se demora el envío a Bucaramanga? Quiero energía natural para mis entrenos.',
+    text: 'Acabo de pedir el Pague 2 Lleve 3, ¿también me llega la Loción Térmica de obsequio?',
   },
   {
     author: 'Marié',
-    text: 'Natalia, apenas confirmas por WhatsApp te activamos el acceso a la App TyroFem 30D. A Bucaramanga llega en 2 a 3 días hábiles.',
+    text: '¡Sí Natalia! Todos los combos del Live incluyen la Loción Térmica de obsequio y acceso gratis a la App TyroFem 30D.',
     isHost: true,
   },
   {
     author: 'Juliana Torres',
     city: 'Pereira',
-    text: 'El de 5 tarros sale muchísimo más económico por tarro, lo voy a compartir con mi mamá.',
+    text: 'Yo pedí el de 5 tarros con mi mamá el mes pasado y las dos dormimos mejor y rendimos muchísimo más en el trabajo, hoy repetimos pedido.',
+  },
+  {
+    author: 'Marié',
+    text: '¡Qué testimonio tan lindo Juliana! Gracias por confiar de nuevo en ColShopi Tienda, el combo VIP es el favorito para compartir en familia.',
+    isHost: true,
   },
   {
     author: 'Sofía Castro',
     city: 'Cartagena',
-    text: 'Me encanta que tenga registro INVIMA RSA-0021928-2022, eso da mucha tranquilidad.',
+    text: 'Al principio dudé pero al ver el registro INVIMA RSA-0021928-2022 me animé, ya llevo 1 mes y la ansiedad por dulce me bajó muchísimo.',
+  },
+  {
+    author: 'Marié',
+    text: '¡Así es Sofía! Contar con registro INVIMA da total tranquilidad y nos alegra muchísimo que ya sientas ese cambio en tus antojos.',
+    isHost: true,
   },
   {
     author: 'Laura Restrepo',
@@ -236,61 +266,17 @@ export const SIMULATED_CHAT_QUEUE: Omit<ChatMessage, 'id' | 'timestamp'>[] = [
   },
   {
     author: 'Marié',
-    text: '¡Claro que sí Laura! Puedes pagar contra entrega al recibir tu pedido en casa.',
+    text: '¡Claro que sí Laura! Puedes pagar en efectivo contra entrega apenas recibas tu pedido en la puerta de tu casa.',
+    isHost: true,
+  },
+  {
+    author: 'Carolina Vélez',
+    city: 'Medellín',
+    text: 'Totalmente garantizado, yo lo preparo frío con leche de almendras después de entrenar y cero cansancio en la tarde.',
+  },
+  {
+    author: 'Marié',
+    text: '¡Súper tip Carolina! Frío con leche de almendras queda espectacular y te mantiene con energía limpia toda la tarde.',
     isHost: true,
   },
 ];
-
-export interface CustomerTestimonial {
-  id: 'camila' | 'paola' | 'diana' | 'juliana';
-  name: string;
-  city: string;
-  initials: string;
-  quote: string;
-  verifiedLabel: string;
-  rating: number;
-}
-
-export const CUSTOMER_TESTIMONIALS: CustomerTestimonial[] = [
-  {
-    id: 'camila',
-    name: 'Camila Restrepo',
-    city: 'Medellín',
-    initials: 'CR',
-    quote:
-      'Desde la segunda semana con Tyruss Full me siento liviana y con energía todo el día.',
-    verifiedLabel: 'Compra verificada',
-    rating: 5,
-  },
-  {
-    id: 'paola',
-    name: 'Paola Gómez',
-    city: 'Bogotá',
-    initials: 'PG',
-    quote:
-      'Llegó contra entrega en 2 días y con la App TyroFem 30D ya bajé la inflamación.',
-    verifiedLabel: 'Compra verificada',
-    rating: 5,
-  },
-  {
-    id: 'diana',
-    name: 'Diana Silva',
-    city: 'Cali',
-    initials: 'DS',
-    quote:
-      'Sabe delicioso con leche de almendras y por fin duermo mejor sin pesadez.',
-    verifiedLabel: 'Compra verificada',
-    rating: 5,
-  },
-  {
-    id: 'juliana',
-    name: 'Juliana Montoya',
-    city: 'Barranquilla',
-    initials: 'JM',
-    quote:
-      'Voy por mi segundo combo. Cero azúcar añadida y la app acompaña todo el proceso.',
-    verifiedLabel: 'Compra verificada',
-    rating: 5,
-  },
-];
-

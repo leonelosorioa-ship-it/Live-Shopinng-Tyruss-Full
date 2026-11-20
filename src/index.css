@@ -135,15 +135,15 @@
 @keyframes ctaPulseScale {
   0%,
   100% {
-    transform: scale(0.965);
+    transform: scale(0.992);
   }
   50% {
-    transform: scale(1.035);
+    transform: scale(1.012);
   }
 }
 
 .animate-cta-pulse {
-  animation: ctaPulseScale 1.35s ease-in-out infinite;
+  animation: ctaPulseScale 2.8s ease-in-out infinite;
   transform-origin: center;
   will-change: transform;
 }
@@ -243,22 +243,6 @@
   will-change: transform, opacity;
 }
 
-@keyframes testimonialSlideIn {
-  0% {
-    opacity: 0;
-    transform: translate3d(-10px, 8px, 0) scale(0.97);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-.animate-testimonial-in {
-  animation: testimonialSlideIn 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
-}
-
 /* Ocultar scrollbar en chat y modal manteniendo usabilidad táctil */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -279,8 +263,7 @@
   .animate-entry-ripple-delayed,
   .animate-entry-glow,
   .animate-tap-nudge,
-  .animate-prompt-in,
-  .animate-testimonial-in {
+  .animate-prompt-in {
     animation: none !important;
   }
 }
