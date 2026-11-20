@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MousePointerClick, Play, Sparkles, Volume2 } from 'lucide-react';
+import { Volume2 } from 'lucide-react';
 import {
   COMBO_OPTIONS,
   INITIAL_CHAT_MESSAGES,
@@ -40,6 +40,7 @@ export default function App() {
   const [isMuted, setIsMuted] = useState<boolean>(() =>
     hasFinishedLiveInSession() ? true : !autostart
   );
+  const [entryStage, setEntryStage] = useState<'connecting' | 'sound'>('connecting');
 
   const [viewerCount, setViewerCount] = useState<number>(612);
   const [likesCount, setLikesCount] = useState<number>(4844);
@@ -80,6 +81,16 @@ export default function App() {
       window.removeEventListener('beforeinstallprompt', preventInstallPrompt);
     };
   }, []);
+
+  // Secuencia inicial: 4 segundos en "Conectando al Live" y luego botón rápido de sonido
+  useEffect(() => {
+    if (audioActivated || liveEnded) return;
+    setEntryStage('connecting');
+    const timer = window.setTimeout(() => {
+      setEntryStage('sound');
+    }, 4000);
+    return () => window.clearTimeout(timer);
+  }, [audioActivated, liveEnded]);
 
   // Variación realista del número de espectadores en vivo
   useEffect(() => {
@@ -193,24 +204,47 @@ export default function App() {
     };
   }, [liveEnded, spawnFloatingHeart]);
 
-  // Inyección automática más pausada de mensajes de las mujeres asistentes y Marié
+  // Inyección inmediata y orgánica de mensajes para mostrar actividad en vivo desde los primeros segundos
   useEffect(() => {
     if (liveEnded) return;
-    const timer = window.setInterval(() => {
-      const nextTemplate =
-        SIMULATED_CHAT_QUEUE[chatCursorRef.current % SIMULATED_CHAT_QUEUE.length];
-      chatCursorRef.current += 1;
+    let timerId: number | undefined;
+    let cancelled = false;
+    let step = 0;
 
-      const newMessage: ChatMessage = {
-        ...nextTemplate,
-        id: `sim-${Date.now()}-${chatCursorRef.current}`,
-        timestamp: 'Ahora',
-      };
+    const scheduleNextComment = () => {
+      const delayMs =
+        step === 0
+          ? 1300
+          : step === 1
+          ? 1700
+          : step === 2
+          ? 2200
+          : 5500 + Math.round(Math.random() * 2500);
 
-      setChatMessages((prev) => [...prev.slice(-18), newMessage]);
-    }, 11000);
+      timerId = window.setTimeout(() => {
+        if (cancelled) return;
+        const nextTemplate =
+          SIMULATED_CHAT_QUEUE[chatCursorRef.current % SIMULATED_CHAT_QUEUE.length];
+        chatCursorRef.current += 1;
+        step += 1;
 
-    return () => window.clearInterval(timer);
+        const newMessage: ChatMessage = {
+          ...nextTemplate,
+          id: `sim-${Date.now()}-${chatCursorRef.current}`,
+          timestamp: 'Ahora',
+        };
+
+        setChatMessages((prev) => [...prev.slice(-18), newMessage]);
+        scheduleNextComment();
+      }, delayMs);
+    };
+
+    scheduleNextComment();
+
+    return () => {
+      cancelled = true;
+      if (timerId !== undefined) window.clearTimeout(timerId);
+    };
   }, [liveEnded]);
 
   // Limpieza del controlador de audio al desmontar
@@ -364,8 +398,57 @@ export default function App() {
           onLike={handleLike}
         />
 
-        {/* Capa 3: Zona intermedia — Chat (inferior izquierdo) dejando el video limpio */}
-        <div className="relative z-10 flex-1 flex items-end justify-start px-3 pb-2 pointer-events-none">
+        {/* Capa 3: Zona intermedia — Aviso flotante ligero sobre el video claro + Chat en vivo */}
+        <div
+          onClick={
+            !audioActivated && !liveEnded
+              ? (e) => {
+                  if (e.target === e.currentTarget) handleActivateAudio();
+                }
+              : undefined
+          }
+          className={`relative z-10 flex-1 flex flex-col justify-end px-3 pb-2 ${
+            !audioActivated && !liveEnded ? 'cursor-pointer' : 'pointer-events-none'
+          }`}
+        >
+          {!audioActivated && !liveEnded && (
+            <div className="flex-1 flex items-center justify-center px-3 pointer-events-none">
+              {entryStage === 'connecting' ? (
+                <div key="connecting-stage" className="animate-prompt-in">
+                  <button
+                    type="button"
+                    onClick={handleActivateAudio}
+                    data-testid="connecting-live-pill"
+                    className="pointer-events-auto max-w-[300px] px-5 py-3 rounded-2xl bg-black/55 backdrop-blur-md border border-white/15 shadow-[0_8px_28px_rgba(0,0,0,0.38)] text-center space-y-1 cursor-pointer active:scale-[0.98] transition-transform"
+                  >
+                    <p className="inline-flex items-center justify-center gap-2 font-display text-[14px] font-bold text-white leading-tight">
+                      <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-85" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+                      </span>
+                      <span>Conectando al Live</span>
+                    </p>
+                    <p className="text-[12px] text-white/90 leading-snug">
+                      Marié está en vivo presentando Tyruss Full
+                    </p>
+                  </button>
+                </div>
+              ) : (
+                <div key="sound-stage" className="animate-prompt-in">
+                  <button
+                    type="button"
+                    onClick={handleActivateAudio}
+                    data-testid="activate-audio-btn"
+                    className="pointer-events-auto min-h-[46px] inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-black/60 hover:bg-black/72 backdrop-blur-md border border-white/25 text-white font-display text-[14px] font-semibold tracking-tight whitespace-nowrap shadow-[0_10px_28px_rgba(0,0,0,0.42)] active:scale-[0.97] transition-all cursor-pointer animate-cta-pulse"
+                  >
+                    <Volume2 className="w-5 h-5 text-white shrink-0" aria-hidden="true" />
+                    <span>Toca para activar el sonido</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <LiveChatFeed messages={chatMessages} />
         </div>
 
@@ -390,72 +473,6 @@ export default function App() {
           cartDemandCount={cartDemandCount}
           remainingProducts={remainingProducts}
         />
-
-        {/* Capa flotante inicial interactiva para activar el sonido e iniciar el Live */}
-        {!audioActivated && !liveEnded && (
-          <div
-            onClick={(e) => {
-              if (e.target === e.currentTarget) handleActivateAudio();
-            }}
-            className="absolute inset-0 z-30 flex items-center justify-center bg-black/62 backdrop-blur-[4px] px-6 cursor-pointer"
-          >
-            <button
-              type="button"
-              onClick={handleActivateAudio}
-              data-testid="activate-audio-btn"
-              className="group relative w-full max-w-[310px] flex flex-col items-center gap-4 p-6 rounded-3xl bg-zinc-950/92 border border-emerald-400/55 hover:border-cyan-300 hover:scale-[1.02] active:scale-[0.97] transition-all cursor-pointer animate-entry-glow"
-            >
-              {/* Indicador vivo arriba de la tarjeta */}
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/45 text-[10.5px] font-bold tracking-wide text-rose-200">
-                <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-85" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
-                </span>
-                EN VIVO AHORA · {viewerCount} conectadas
-              </span>
-
-              {/* Ícono central con ondas concéntricas pulsantes */}
-              <div className="relative flex items-center justify-center my-1">
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 rounded-full border-2 border-cyan-400/60 animate-entry-ripple pointer-events-none"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 rounded-full border-2 border-emerald-400/50 animate-entry-ripple-delayed pointer-events-none"
-                />
-                <div className="relative flex items-center justify-center w-18 h-18 rounded-full bg-gradient-to-br from-cyan-400 via-teal-300 to-emerald-400 text-slate-950 shadow-[0_0_24px_rgba(34,211,238,0.45)] group-hover:scale-105 transition-transform">
-                  <Volume2 className="w-8 h-8" />
-                  <span className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center border-2 border-zinc-950 shadow-md">
-                    <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
-                  </span>
-                </div>
-              </div>
-
-              <div className="text-center space-y-1.5">
-                <p className="font-display text-[17.5px] font-extrabold text-white leading-snug text-balance">
-                  Toca para activar el sonido del Live
-                </p>
-                <p className="text-xs text-zinc-300 leading-relaxed text-balance">
-                  Marié está en vivo presentando{' '}
-                  <span className="text-emerald-300 font-semibold">Tyruss Full</span> + App TyroFem 30D
-                </p>
-              </div>
-
-              {/* Botón CTA pulsante que invita al clic */}
-              <div className="w-full space-y-1.5">
-                <span className="w-full min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 text-slate-950 font-display text-[11.5px] sm:text-[12px] font-extrabold tracking-tight whitespace-nowrap shadow-[0_8px_24px_rgba(16,185,129,0.4)] animate-cta-pulse">
-                  <Sparkles className="w-3.5 h-3.5 text-slate-900 shrink-0" />
-                  <span>Toca aquí para iniciar el Live</span>
-                  <MousePointerClick className="w-3.5 h-3.5 text-slate-900 shrink-0 animate-tap-nudge" />
-                </span>
-                <p className="text-[10.5px] font-medium text-cyan-200/85">
-                  Activa audio y video en tiempo real
-                </p>
-              </div>
-            </button>
-          </div>
-        )}
 
         {/* Aviso de llamado a la acción al finalizar el Live (sin reiniciar el video desde cero) */}
         {liveEnded && (

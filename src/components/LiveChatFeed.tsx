@@ -32,10 +32,10 @@ export function LiveChatFeed({ messages }: LiveChatFeedProps) {
             key={msg.id}
             className={`px-2.5 py-1 rounded-2xl text-[11px] leading-snug backdrop-blur-md border transition-all duration-200 ${
               msg.isHost
-                ? 'bg-emerald-950/80 border-emerald-400/35 text-emerald-50'
+                ? 'bg-emerald-950/75 border-emerald-400/35 text-emerald-50'
                 : msg.isUser
-                ? 'bg-cyan-950/85 border-cyan-400/45 text-white'
-                : 'bg-black/55 border-white/10 text-zinc-100'
+                ? 'bg-cyan-950/80 border-cyan-400/45 text-white'
+                : 'bg-black/48 border-white/12 text-zinc-100'
             }`}
           >
             <div className="flex items-center gap-1.5 flex-wrap">

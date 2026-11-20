@@ -81,7 +81,7 @@ export function LiveFooterBar({
   };
 
   return (
-    <footer className="relative z-20 px-3 pb-2.5 pt-1 bg-gradient-to-t from-black via-black/92 to-transparent space-y-1.5">
+    <footer className="relative z-20 px-3 pb-2.5 pt-1 bg-gradient-to-t from-black/80 via-black/45 to-transparent space-y-1.5">
       {/* Fila compacta de comentarios + botón representativo de Compartir enseguida */}
       <div className="flex items-center gap-2">
         <form

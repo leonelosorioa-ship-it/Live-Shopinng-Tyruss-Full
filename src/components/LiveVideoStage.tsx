@@ -110,14 +110,14 @@ export function LiveVideoStage({
         />
       )}
 
-      {/* Degradados suaves solo en bordes superior e inferior para mantener legible la UI sobre el video */}
+      {/* Degradados suaves y claros en bordes superior e inferior para mantener legible la UI sin oscurecer el video */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/70 via-black/30 to-transparent pointer-events-none"
+        className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/38 via-black/14 to-transparent pointer-events-none"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-black/92 via-black/45 to-transparent pointer-events-none"
+        className="absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-black/68 via-black/22 to-transparent pointer-events-none"
       />
     </div>
   );

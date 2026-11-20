@@ -227,6 +227,22 @@
   will-change: transform;
 }
 
+@keyframes promptPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translate3d(0, 4px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.animate-prompt-in {
+  animation: promptPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
 /* Ocultar scrollbar en chat y modal manteniendo usabilidad táctil */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -246,7 +262,8 @@
   .animate-entry-ripple,
   .animate-entry-ripple-delayed,
   .animate-entry-glow,
-  .animate-tap-nudge {
+  .animate-tap-nudge,
+  .animate-prompt-in {
     animation: none !important;
   }
 }

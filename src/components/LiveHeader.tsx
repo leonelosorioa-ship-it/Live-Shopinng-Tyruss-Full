@@ -24,7 +24,7 @@ export function LiveHeader({
 }: LiveHeaderProps) {
   const isUrgent = remainingSeconds !== null && remainingSeconds <= 15;
   return (
-    <header className="relative z-20 px-3 pt-2 pb-1.5 bg-gradient-to-b from-black/88 via-black/55 to-transparent space-y-1.5">
+    <header className="relative z-20 px-3 pt-2 pb-1.5 bg-gradient-to-b from-black/48 via-black/20 to-transparent space-y-1.5">
       {/* Fila 1: Logo + ColShopi Tienda + LIVE SHOP + Temporizador + Mute */}
       <div className="flex items-center justify-between gap-1.5">
         <div className="flex items-center gap-1.5 min-w-0">
