@@ -20,46 +20,46 @@ export function LiveChatFeed({ messages }: LiveChatFeedProps) {
   return (
     <section
       aria-label="Chat en vivo de compradoras"
-      className="w-[calc(100%-120px)] max-w-[268px] pointer-events-auto"
+      className="w-[calc(100%-108px)] max-w-[276px] pointer-events-auto"
     >
       <div
         ref={scrollRef}
         data-testid="live-chat-feed"
-        className="max-h-[140px] overflow-y-auto no-scrollbar chat-mask flex flex-col gap-1 pr-1 pt-4"
+        className="max-h-[142px] overflow-y-auto no-scrollbar chat-mask flex flex-col gap-1.5 pr-1 pt-4"
       >
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`px-2.5 py-1 rounded-2xl text-[11px] leading-snug backdrop-blur-md border transition-all duration-200 ${
+            className={`px-2.5 py-1.5 rounded-2xl text-[11px] leading-snug backdrop-blur-md border shadow-[0_2px_10px_rgba(15,23,42,0.08)] transition-all duration-200 ${
               msg.isHost
-                ? 'bg-emerald-950/75 border-emerald-400/35 text-emerald-50'
+                ? 'bg-emerald-50/92 border-emerald-200/90 text-slate-800'
                 : msg.isUser
-                ? 'bg-cyan-950/80 border-cyan-400/45 text-white'
-                : 'bg-black/48 border-white/12 text-zinc-100'
+                ? 'bg-sky-50/92 border-sky-200/90 text-slate-800'
+                : 'bg-white/84 border-white/75 text-slate-800'
             }`}
           >
             <div className="flex items-center gap-1.5 flex-wrap">
               <span
                 className={`font-display font-bold text-[11px] ${
                   msg.isHost
-                    ? 'text-emerald-300'
+                    ? 'text-emerald-800'
                     : msg.isUser
-                    ? 'text-cyan-300'
-                    : 'text-amber-300'
+                    ? 'text-sky-800'
+                    : 'text-slate-900'
                 }`}
               >
                 {msg.author}
               </span>
               {msg.isHost && (
-                <span className="text-[9px] font-bold uppercase tracking-wider px-1 py-px rounded bg-emerald-400/20 text-emerald-200">
+                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-px rounded bg-emerald-100 text-emerald-800">
                   Guía
                 </span>
               )}
               {msg.city && (
-                <span className="text-[10px] text-zinc-400">· {msg.city}</span>
+                <span className="text-[10px] text-slate-500">· {msg.city}</span>
               )}
             </div>
-            <p className="mt-0.5 text-white/95 break-words">{msg.text}</p>
+            <p className="mt-0.5 text-slate-700 break-words">{msg.text}</p>
           </div>
         ))}
       </div>

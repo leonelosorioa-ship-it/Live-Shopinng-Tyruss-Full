@@ -66,11 +66,11 @@ export function LiveVideoStage({
   };
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-black select-none">
-      {/* Resplandor ambiental de fondo */}
+    <div className="absolute inset-0 z-0 overflow-hidden bg-slate-100 select-none">
+      {/* Fondo ambiental claro y suave mientras carga el video */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(16,185,129,0.18),rgba(6,182,212,0.08)_45%,rgba(0,0,0,0.95)_85%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(236,253,245,0.6),rgba(241,245,249,0.9)_85%)]"
       />
 
       {videoError ? (
@@ -110,14 +110,14 @@ export function LiveVideoStage({
         />
       )}
 
-      {/* Degradados suaves y claros en bordes superior e inferior para mantener legible la UI sin oscurecer el video */}
+      {/* Degradados muy suaves solo en bordes para mantener claridad y nitidez sin oscurecer el video */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/38 via-black/14 to-transparent pointer-events-none"
+        className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-slate-900/20 via-slate-900/5 to-transparent pointer-events-none"
       />
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[36%] bg-gradient-to-t from-black/68 via-black/22 to-transparent pointer-events-none"
+        className="absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-t from-slate-900/32 via-slate-900/10 to-transparent pointer-events-none"
       />
     </div>
   );

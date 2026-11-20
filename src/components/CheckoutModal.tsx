@@ -141,28 +141,31 @@ export function CheckoutModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
-      className="absolute inset-0 z-40 flex items-end justify-center bg-black/75 backdrop-blur-sm animate-[fadeIn_160ms_ease-out]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="absolute inset-0 z-40 flex items-end justify-center bg-slate-950/50 backdrop-blur-[2px] animate-[fadeIn_160ms_ease-out]"
     >
-      <div className="w-full max-h-[90dvh] rounded-t-3xl bg-zinc-950 border-t border-x border-white/15 shadow-2xl flex flex-col overflow-hidden">
+      <div className="w-full max-h-[90dvh] rounded-t-3xl bg-white border-t border-x border-slate-200 text-slate-900 shadow-2xl flex flex-col overflow-hidden">
         {/* Cabecera fija del modal */}
-        <div className="px-4 pt-3 pb-2.5 border-b border-white/10 shrink-0">
-          <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-3" aria-hidden="true" />
+        <div className="px-4 pt-3 pb-2.5 border-b border-slate-200 bg-white shrink-0">
+          <div className="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3" aria-hidden="true" />
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
               <img
                 src={PRODUCT_INFO.imageFrontTransparent}
                 alt={PRODUCT_INFO.name}
                 referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-xl bg-white/5 p-1 object-contain shrink-0"
+                className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/80 p-1 object-contain shrink-0"
               />
               <div className="min-w-0">
                 <h2
                   id="checkout-modal-title"
-                  className="font-display text-sm font-bold text-white truncate"
+                  className="font-display text-sm font-bold text-slate-900 truncate"
                 >
                   {PRODUCT_INFO.name} ({PRODUCT_INFO.weight})
                 </h2>
-                <p className="text-[11px] text-emerald-300 truncate">
+                <p className="text-[11px] font-medium text-emerald-700 truncate">
                   {STORE_BRAND.name} · Pago contra entrega
                 </p>
               </div>
@@ -172,7 +175,7 @@ export function CheckoutModal({
               type="button"
               onClick={onClose}
               aria-label="Cerrar ventana de compra"
-              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 text-zinc-200 hover:bg-white/20 hover:text-white transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -183,17 +186,17 @@ export function CheckoutModal({
             <div
               role="tablist"
               aria-label="Opciones del producto"
-              className="mt-3 grid grid-cols-2 gap-1 p-1 rounded-xl bg-zinc-900 border border-white/10"
+              className="mt-3 grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200/90"
             >
               <button
                 type="button"
                 role="tab"
                 aria-selected={activeTab === 'checkout'}
                 onClick={() => setActiveTab('checkout')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'checkout'
-                    ? 'bg-emerald-400 text-slate-950 font-bold'
-                    : 'text-zinc-300 hover:text-white'
+                    ? 'bg-white text-emerald-800 font-bold shadow-sm ring-1 ring-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Combos y Pedido
@@ -203,10 +206,10 @@ export function CheckoutModal({
                 role="tab"
                 aria-selected={activeTab === 'details'}
                 onClick={() => setActiveTab('details')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === 'details'
-                    ? 'bg-emerald-400 text-slate-950 font-bold'
-                    : 'text-zinc-300 hover:text-white'
+                    ? 'bg-white text-emerald-800 font-bold shadow-sm ring-1 ring-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Ingredientes e INVIMA
@@ -216,19 +219,19 @@ export function CheckoutModal({
         </div>
 
         {/* Contenido desplazable */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-white">
           {confirmedOrder ? (
             /* Pantalla de confirmación lista para WhatsApp */
             <div data-testid="order-confirmation" className="space-y-4 pb-2">
-              <div className="p-4 rounded-2xl bg-emerald-950/50 border border-emerald-400/30 flex items-start gap-3">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-display text-sm font-bold text-white">
+                  <h3 className="font-display text-sm font-bold text-emerald-950">
                     ¡Tu pedido está listo para enviar a Marié!
                   </h3>
-                  <p className="text-xs text-emerald-100/90 mt-1 leading-relaxed">
+                  <p className="text-xs text-emerald-900/85 mt-1 leading-relaxed">
                     Toca el botón verde para abrir WhatsApp con tu orden completa y activar tu{' '}
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-emerald-950">
                       {confirmedOrder.combo.isVip ? 'App TyroFem 30D VIP' : 'App TyroFem 30D'}
                     </span>
                     .
@@ -239,28 +242,28 @@ export function CheckoutModal({
               {/* Listado completo del pedido */}
               <div
                 data-testid="order-summary-list"
-                className="p-3.5 rounded-2xl bg-zinc-900 border border-white/10 space-y-2.5 text-xs"
+                className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5 text-xs"
               >
-                <p className="font-display text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                <p className="font-display text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Listado de tu pedido
                 </p>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-white">
+                    <span className="font-medium text-slate-900">
                       1x Tyruss Full (500g) · {confirmedOrder.combo.title}
                     </span>
-                    <span className="font-mono-tabular text-zinc-200 shrink-0">
+                    <span className="font-mono-tabular font-semibold text-slate-900 shrink-0">
                       {formatCOP(confirmedOrder.combo.price)}
                     </span>
                   </div>
 
                   <div
                     data-testid="order-item-locion-termica"
-                    className="flex items-center justify-between gap-2 text-amber-200"
+                    className="flex items-center justify-between gap-2 text-amber-800"
                   >
-                    <span className="font-medium">1x {GIFT_ADDON.title}</span>
-                    <span className="font-mono-tabular font-bold text-emerald-300 shrink-0">
+                    <span className="font-semibold">1x {GIFT_ADDON.title}</span>
+                    <span className="font-mono-tabular font-bold text-emerald-700 shrink-0">
                       GRATIS ({formatCOP(GIFT_ADDON.price)})
                     </span>
                   </div>
@@ -268,42 +271,42 @@ export function CheckoutModal({
                   {confirmedOrder.includeBatidoVerde && (
                     <div
                       data-testid="order-item-batido-verde"
-                      className="flex items-center justify-between gap-2 text-emerald-300"
+                      className="flex items-center justify-between gap-2 text-emerald-700"
                     >
                       <span className="font-medium">1x {BATIDO_VERDE_ADDON.title}</span>
-                      <span className="font-mono-tabular shrink-0">
+                      <span className="font-mono-tabular font-semibold shrink-0">
                         +{formatCOP(BATIDO_VERDE_ADDON.price)}
                       </span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-zinc-400">Bonificación</span>
-                    <span className="font-medium text-emerald-300">
+                    <span className="text-slate-500">Bonificación</span>
+                    <span className="font-semibold text-emerald-700">
                       {confirmedOrder.combo.bonusLabel.replace('+ ', '')}
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                  <span className="font-semibold text-zinc-200">Total a pagar</span>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                  <span className="font-semibold text-slate-800">Total a pagar</span>
                   <span
                     data-testid="confirmed-total-price"
-                    className="font-mono-tabular font-bold text-cyan-300 text-sm"
+                    className="font-mono-tabular font-extrabold text-emerald-800 text-sm"
                   >
                     {formatCOP(confirmedOrder.totalPrice)} COP
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-white/10 space-y-1 text-zinc-300">
+                <div className="pt-2 border-t border-slate-200 space-y-1 text-slate-600">
                   <p>
-                    <strong className="text-white">Cliente:</strong> {confirmedOrder.customer.fullName}
+                    <strong className="text-slate-900">Cliente:</strong> {confirmedOrder.customer.fullName}
                   </p>
                   <p>
-                    <strong className="text-white">WhatsApp:</strong> {confirmedOrder.customer.phone}
+                    <strong className="text-slate-900">WhatsApp:</strong> {confirmedOrder.customer.phone}
                   </p>
                   <p>
-                    <strong className="text-white">Destino:</strong> {confirmedOrder.customer.city} —{' '}
+                    <strong className="text-slate-900">Destino:</strong> {confirmedOrder.customer.city} —{' '}
                     {confirmedOrder.customer.address}
                   </p>
                 </div>
@@ -318,16 +321,16 @@ export function CheckoutModal({
                 onClick={handleToggleBatidoVerde}
                 className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                   confirmedOrder.includeBatidoVerde
-                    ? 'bg-emerald-950/60 border-emerald-400 shadow-[0_0_0_1px_rgba(52,211,153,0.45)]'
-                    : 'bg-zinc-900/90 border-white/15 hover:border-emerald-400/50'
+                    ? 'bg-emerald-50 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.28)]'
+                    : 'bg-white border-slate-200 hover:border-emerald-400'
                 }`}
               >
                 <div className="flex items-start gap-2.5 min-w-0">
                   <span
                     className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                       confirmedOrder.includeBatidoVerde
-                        ? 'bg-emerald-400 border-emerald-400 text-slate-950'
-                        : 'bg-zinc-950 border-white/30 text-zinc-400'
+                        ? 'bg-emerald-600 border-emerald-600 text-white'
+                        : 'bg-white border-slate-300 text-slate-500'
                     }`}
                   >
                     {confirmedOrder.includeBatidoVerde ? (
@@ -338,24 +341,24 @@ export function CheckoutModal({
                   </span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-display text-xs font-bold text-white">
+                      <span className="font-display text-xs font-bold text-slate-900">
                         Adicionar {BATIDO_VERDE_ADDON.title}
                       </span>
-                      <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300">
+                      <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
                         Oferta Live
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">
                       {BATIDO_VERDE_ADDON.subtitle}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <p className="font-mono-tabular text-xs font-bold text-emerald-300">
+                  <p className="font-mono-tabular text-xs font-bold text-emerald-700">
                     +{formatCOP(BATIDO_VERDE_ADDON.price)}
                   </p>
-                  <p className="font-mono-tabular text-[10px] text-zinc-500 line-through">
+                  <p className="font-mono-tabular text-[10px] text-slate-400 line-through">
                     {formatCOP(BATIDO_VERDE_ADDON.regularPrice)}
                   </p>
                 </div>
@@ -377,18 +380,18 @@ export function CheckoutModal({
                       num_items: confirmedOrder.includeBatidoVerde ? 2 : 1,
                     })
                   }
-                  className="w-full min-h-[48px] px-4 py-2.5 rounded-2xl bg-[#25D366] text-slate-950 font-display text-[13px] font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 hover:brightness-105 active:scale-[0.98] transition-all whitespace-nowrap"
+                  className="w-full min-h-[48px] px-4 py-2.5 rounded-2xl bg-[#25D366] text-slate-950 font-display text-[13px] font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(37,211,102,0.3)] hover:brightness-105 active:scale-[0.98] transition-all whitespace-nowrap"
                 >
                   <span>Enviar Pedido por WhatsApp</span>
                   <ExternalLink className="w-4 h-4 shrink-0" />
                 </a>
-                <p className="text-center text-[11px] text-zinc-400">
+                <p className="text-center text-[11px] text-slate-500">
                   Línea oficial ColShopi Tienda: {STORE_BRAND.whatsappDisplay}
                 </p>
                 <button
                   type="button"
                   onClick={() => setConfirmedOrder(null)}
-                  className="w-full min-h-[40px] px-4 py-2 rounded-xl bg-zinc-900 border border-white/10 text-xs font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  className="w-full min-h-[40px] px-4 py-2 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   Modificar datos o cambiar combo
                 </button>
@@ -397,31 +400,31 @@ export function CheckoutModal({
           ) : activeTab === 'details' ? (
             /* Pestaña de Ingredientes, Preparación e INVIMA */
             <div className="space-y-4 pb-2">
-              <div className="rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 p-3 flex items-center gap-3">
+              <div className="rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 p-3 flex items-center gap-3">
                 <img
                   src={PRODUCT_INFO.imageBackLabel}
                   alt="Etiqueta nutricional y preparación Tyruss Full"
                   referrerPolicy="no-referrer"
-                  className="w-24 h-28 object-contain rounded-xl bg-white/5 shrink-0"
+                  className="w-24 h-28 object-contain rounded-xl bg-white border border-slate-200/80 p-1 shrink-0"
                 />
                 <div className="space-y-1.5">
-                  <span className="text-[11px] font-bold text-emerald-300">
+                  <span className="text-[11px] font-bold text-emerald-700">
                     INVIMA: {PRODUCT_INFO.invima}
                   </span>
-                  <p className="text-xs text-zinc-200 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     {PRODUCT_INFO.shortSummary}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-display text-xs font-bold text-white">
+                <h3 className="font-display text-xs font-bold text-slate-900">
                   Beneficios de la fórmula
                 </h3>
                 <ul className="space-y-1.5">
                   {PRODUCT_INFO.highlights.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-xs text-zinc-300">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <li key={item} className="flex items-start gap-2 text-xs text-slate-700">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -429,16 +432,16 @@ export function CheckoutModal({
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-display text-xs font-bold text-white">
+                <h3 className="font-display text-xs font-bold text-slate-900">
                   Preparación en 3 pasos
                 </h3>
                 <ol className="space-y-2">
                   {PRODUCT_INFO.preparationSteps.map((step, idx) => (
                     <li
                       key={step}
-                      className="flex items-start gap-2.5 p-2.5 rounded-xl bg-zinc-900 border border-white/10 text-xs text-zinc-200"
+                      className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700"
                     >
-                      <span className="w-5 h-5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono-tabular font-bold text-[11px] flex items-center justify-center shrink-0">
+                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-mono-tabular font-bold text-[11px] flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
                       <span>{step}</span>
@@ -447,13 +450,13 @@ export function CheckoutModal({
                 </ol>
               </div>
 
-              <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-950/70 to-cyan-950/70 border border-emerald-400/30 flex items-start gap-2.5">
-                <Gift className="w-5 h-5 text-cyan-300 shrink-0 mt-0.5" />
+              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+                <Gift className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-display text-xs font-bold text-white">
+                  <p className="font-display text-xs font-bold text-emerald-950">
                     Regalo incluido: {PRODUCT_INFO.appGift.name}
                   </p>
-                  <p className="text-[11px] text-zinc-200 mt-0.5 leading-relaxed">
+                  <p className="text-[11px] text-emerald-900/85 mt-0.5 leading-relaxed">
                     {PRODUCT_INFO.appGift.description}
                   </p>
                 </div>
@@ -462,7 +465,7 @@ export function CheckoutModal({
               <button
                 type="button"
                 onClick={() => setActiveTab('checkout')}
-                className="w-full min-h-[44px] rounded-2xl bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-950 font-display text-xs font-extrabold cursor-pointer"
+                className="w-full min-h-[44px] rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-display text-xs font-extrabold transition-colors cursor-pointer"
               >
                 Elegir mi Combo ahora
               </button>
@@ -472,10 +475,10 @@ export function CheckoutModal({
             <form onSubmit={handleSubmit} noValidate className="space-y-4 pb-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display text-xs font-bold text-zinc-200">
+                  <h3 className="font-display text-xs font-bold text-slate-900">
                     1. Selecciona tu Combo Oficial
                   </h3>
-                  <span className="text-[11px] text-cyan-300 font-medium">
+                  <span className="text-[11px] text-emerald-700 font-semibold">
                     Envío a toda Colombia
                   </span>
                 </div>
@@ -493,39 +496,39 @@ export function CheckoutModal({
                         onClick={() => onSelectCombo(combo.id)}
                         className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
                           isSelected
-                            ? 'bg-emerald-950/55 border-emerald-400 shadow-[0_0_0_1px_rgba(52,211,153,0.45)]'
-                            : 'bg-zinc-900/90 border-white/10 hover:border-white/25'
+                            ? 'bg-emerald-50/85 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.28)]'
+                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60'
                         }`}
                       >
                         <div className="min-w-0 space-y-0.5">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-display text-[13px] font-bold text-white">
+                            <span className="font-display text-[13px] font-bold text-slate-900">
                               {combo.title}
                             </span>
                             {combo.badge && (
                               <span
                                 className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                                   combo.isVip
-                                    ? 'bg-amber-400 text-slate-950'
-                                    : 'bg-rose-500 text-white'
+                                    ? 'bg-amber-100 text-amber-900 border border-amber-300/80'
+                                    : 'bg-rose-600 text-white'
                                 }`}
                               >
                                 {combo.badge}
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-emerald-300 font-medium">
+                          <p className="text-[11px] text-emerald-700 font-semibold">
                             {combo.bonusLabel}
                           </p>
-                          <p className="text-[10px] text-zinc-400">{combo.subtitle}</p>
+                          <p className="text-[10.5px] text-slate-500">{combo.subtitle}</p>
                         </div>
 
                         <div className="text-right shrink-0">
-                          <p className="font-mono-tabular text-sm font-bold text-white">
+                          <p className="font-mono-tabular text-sm font-bold text-slate-900">
                             {formatCOP(combo.price)}
                           </p>
                           {combo.compareAtPrice && (
-                            <p className="font-mono-tabular text-[10px] text-zinc-500 line-through">
+                            <p className="font-mono-tabular text-[10px] text-slate-400 line-through">
                               {formatCOP(combo.compareAtPrice)}
                             </p>
                           )}
@@ -538,12 +541,12 @@ export function CheckoutModal({
 
               {/* Item predeterminado incluido gratis: Loción Térmica (Obsequio) */}
               <div className="space-y-1.5">
-                <h3 className="font-display text-xs font-bold text-zinc-200">
+                <h3 className="font-display text-xs font-bold text-slate-900">
                   Obsequio predeterminado incluido en tu pedido
                 </h3>
                 <div
                   data-testid="gift-locion-termica-card"
-                  className="w-full p-3 rounded-2xl border bg-amber-950/35 border-amber-400/55 shadow-[0_0_0_1px_rgba(251,191,36,0.22)] flex items-center justify-between gap-2.5"
+                  className="w-full p-3 rounded-2xl border bg-amber-50/75 border-amber-300 flex items-center justify-between gap-2.5"
                 >
                   <div className="flex items-start gap-2.5 min-w-0">
                     <span
@@ -553,20 +556,20 @@ export function CheckoutModal({
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </span>
                     <div className="min-w-0">
-                      <span className="block font-display text-[12.5px] font-bold text-white">
+                      <span className="block font-display text-[12.5px] font-bold text-slate-900">
                         {GIFT_ADDON.title}
                       </span>
-                      <p className="text-[10.5px] text-amber-100/80 mt-0.5">
+                      <p className="text-[10.5px] text-amber-900/80 mt-0.5">
                         {GIFT_ADDON.subtitle}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="font-mono-tabular text-xs font-extrabold text-emerald-300">
+                    <p className="font-mono-tabular text-xs font-extrabold text-emerald-700">
                       GRATIS
                     </p>
-                    <p className="font-mono-tabular text-[10px] text-zinc-400">
+                    <p className="font-mono-tabular text-[10px] text-slate-500">
                       {formatCOP(GIFT_ADDON.price)} COP
                     </p>
                   </div>
@@ -575,7 +578,7 @@ export function CheckoutModal({
 
               {/* Adición opcional: Batido Verde */}
               <div className="space-y-1.5">
-                <h3 className="font-display text-xs font-bold text-zinc-200">
+                <h3 className="font-display text-xs font-bold text-slate-900">
                   Adición recomendada en el Live
                 </h3>
                 <button
@@ -586,16 +589,16 @@ export function CheckoutModal({
                   onClick={handleToggleBatidoVerde}
                   className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                     includeBatidoVerde
-                      ? 'bg-emerald-950/60 border-emerald-400 shadow-[0_0_0_1px_rgba(52,211,153,0.45)]'
-                      : 'bg-zinc-900/90 border-white/10 hover:border-emerald-400/50'
+                      ? 'bg-emerald-50/85 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.28)]'
+                      : 'bg-white border-slate-200 hover:border-emerald-400'
                   }`}
                 >
                   <div className="flex items-start gap-2.5 min-w-0">
                     <span
                       className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                         includeBatidoVerde
-                          ? 'bg-emerald-400 border-emerald-400 text-slate-950'
-                          : 'bg-zinc-950 border-white/30 text-zinc-400'
+                          ? 'bg-emerald-600 border-emerald-600 text-white'
+                          : 'bg-white border-slate-300 text-slate-500'
                       }`}
                     >
                       {includeBatidoVerde ? (
@@ -606,24 +609,24 @@ export function CheckoutModal({
                     </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-display text-[12.5px] font-bold text-white">
+                        <span className="font-display text-[12.5px] font-bold text-slate-900">
                           Agregar {BATIDO_VERDE_ADDON.title}
                         </span>
-                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300">
+                        <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
                           Oferta Live
                         </span>
                       </div>
-                      <p className="text-[10.5px] text-zinc-400 mt-0.5">
+                      <p className="text-[10.5px] text-slate-600 mt-0.5">
                         {BATIDO_VERDE_ADDON.subtitle}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="font-mono-tabular text-xs font-bold text-emerald-300">
+                    <p className="font-mono-tabular text-xs font-bold text-emerald-700">
                       +{formatCOP(BATIDO_VERDE_ADDON.price)}
                     </p>
-                    <p className="font-mono-tabular text-[10px] text-zinc-500 line-through">
+                    <p className="font-mono-tabular text-[10px] text-slate-400 line-through">
                       {formatCOP(BATIDO_VERDE_ADDON.regularPrice)}
                     </p>
                   </div>
@@ -631,14 +634,14 @@ export function CheckoutModal({
               </div>
 
               {/* Resumen dinámico del combo + obsequio + adición */}
-              <div className="p-3 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-between gap-2">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-[11px] text-zinc-400">Total seleccionado</p>
-                  <p className="font-display text-xs font-bold text-white truncate">
+                  <p className="text-[11px] text-slate-500">Total seleccionado</p>
+                  <p className="font-display text-xs font-bold text-slate-900 truncate">
                     {selectedCombo.title} + {GIFT_ADDON.title}
                     {includeBatidoVerde ? ' + Batido Verde' : ''}
                   </p>
-                  <p className="text-[11px] text-emerald-300 font-medium truncate">
+                  <p className="text-[11px] text-emerald-700 font-medium truncate">
                     Incluye {selectedCombo.bonusLabel.replace('+ ', '')}
                     {savings > 0
                       ? ` · Ahorras ${formatCOP(savings + (includeBatidoVerde ? BATIDO_VERDE_ADDON.regularPrice - BATIDO_VERDE_ADDON.price : 0))} COP`
@@ -648,7 +651,7 @@ export function CheckoutModal({
                 <div className="text-right shrink-0">
                   <span
                     data-testid="checkout-total-price"
-                    className="font-mono-tabular text-base font-extrabold text-cyan-300"
+                    className="font-mono-tabular text-base font-extrabold text-emerald-800"
                   >
                     {formatCOP(totalOrderPrice)} COP
                   </span>
@@ -657,12 +660,12 @@ export function CheckoutModal({
 
               {/* Formulario de datos de envío */}
               <div className="space-y-3">
-                <h3 className="font-display text-xs font-bold text-zinc-200">
+                <h3 className="font-display text-xs font-bold text-slate-900">
                   2. Tus datos para el envío contra entrega
                 </h3>
 
                 <div>
-                  <label htmlFor="checkout-fullname" className="block text-xs font-medium text-zinc-300 mb-1">
+                  <label htmlFor="checkout-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
                     Nombre Completo
                   </label>
                   <input
@@ -671,10 +674,10 @@ export function CheckoutModal({
                     value={formValues.fullName}
                     onChange={(e) => handleFieldChange('fullName', e.target.value)}
                     placeholder="Ej. Laura Gómez"
-                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400"
+                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
                   />
                   {errors.fullName && (
-                    <p role="alert" className="mt-1 text-[11px] text-rose-400">
+                    <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
                       {errors.fullName}
                     </p>
                   )}
@@ -682,7 +685,7 @@ export function CheckoutModal({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="checkout-phone" className="block text-xs font-medium text-zinc-300 mb-1">
+                    <label htmlFor="checkout-phone" className="block text-xs font-semibold text-slate-700 mb-1">
                       Celular / WhatsApp
                     </label>
                     <input
@@ -692,17 +695,17 @@ export function CheckoutModal({
                       value={formValues.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       placeholder="Ej. 300 123 4567"
-                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400"
+                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
                     />
                     {errors.phone && (
-                      <p role="alert" className="mt-1 text-[11px] text-rose-400">
+                      <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
                         {errors.phone}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="checkout-city" className="block text-xs font-medium text-zinc-300 mb-1">
+                    <label htmlFor="checkout-city" className="block text-xs font-semibold text-slate-700 mb-1">
                       Ciudad / Municipio
                     </label>
                     <input
@@ -711,10 +714,10 @@ export function CheckoutModal({
                       value={formValues.city}
                       onChange={(e) => handleFieldChange('city', e.target.value)}
                       placeholder="Ej. Medellín"
-                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400"
+                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
                     />
                     {errors.city && (
-                      <p role="alert" className="mt-1 text-[11px] text-rose-400">
+                      <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
                         {errors.city}
                       </p>
                     )}
@@ -722,7 +725,7 @@ export function CheckoutModal({
                 </div>
 
                 <div>
-                  <label htmlFor="checkout-address" className="block text-xs font-medium text-zinc-300 mb-1">
+                  <label htmlFor="checkout-address" className="block text-xs font-semibold text-slate-700 mb-1">
                     Dirección y Barrio
                   </label>
                   <input
@@ -731,23 +734,23 @@ export function CheckoutModal({
                     value={formValues.address}
                     onChange={(e) => handleFieldChange('address', e.target.value)}
                     placeholder="Ej. Cra 43A # 1-50, Barrio El Poblado"
-                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400"
+                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
                   />
                   {errors.address && (
-                    <p role="alert" className="mt-1 text-[11px] text-rose-400">
+                    <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
                       {errors.address}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1">
+              <div className="flex items-center justify-between text-[11px] text-slate-600 pt-1">
                 <span className="inline-flex items-center gap-1">
-                  <Truck className="w-3.5 h-3.5 text-emerald-400" />
+                  <Truck className="w-3.5 h-3.5 text-emerald-600" />
                   Despacho nacional rápido
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                  <Sparkles className="w-3.5 h-3.5 text-teal-600" />
                   Incluye App TyroFem 30D
                 </span>
               </div>
@@ -755,7 +758,7 @@ export function CheckoutModal({
               <button
                 type="submit"
                 data-testid="confirm-order-btn"
-                className="w-full min-h-[48px] px-4 py-3 rounded-2xl bg-[#25D366] text-slate-950 font-display text-sm font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(37,211,102,0.35)] hover:brightness-105 active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full min-h-[48px] px-4 py-3 rounded-2xl bg-[#25D366] text-slate-950 font-display text-sm font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(37,211,102,0.3)] hover:brightness-105 active:scale-[0.98] transition-all cursor-pointer"
               >
                 <span>Confirmar Pedido por WhatsApp</span>
               </button>
