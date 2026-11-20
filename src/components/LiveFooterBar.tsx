@@ -81,14 +81,14 @@ export function LiveFooterBar({
   };
 
   return (
-    <footer className="relative z-20 px-3 pb-2.5 pt-1.5 bg-gradient-to-t from-slate-900/38 via-slate-900/14 to-transparent space-y-1.5">
-      {/* Fila compacta de comentarios + botón Compartir limpio sin pulsación */}
+    <footer className="relative z-20 px-3 pb-2.5 pt-1 bg-gradient-to-t from-black/80 via-black/45 to-transparent space-y-1.5">
+      {/* Fila compacta de comentarios + botón representativo de Compartir enseguida */}
       <div className="flex items-center gap-2">
         <form
           onSubmit={handleSubmit}
-          className="flex-1 min-w-0 flex items-center gap-1.5 pl-3 pr-1 py-0.5 rounded-full bg-white/90 backdrop-blur-md border border-white/80 focus-within:border-emerald-600/60 focus-within:bg-white transition-all shadow-[0_2px_10px_rgba(15,23,42,0.1)]"
+          className="flex-1 min-w-0 flex items-center gap-1 pl-2.5 pr-1 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 focus-within:border-cyan-400/80 focus-within:bg-black/75 transition-all shadow-lg"
         >
-          <MessageCircle className="w-3.5 h-3.5 text-emerald-700 shrink-0" aria-hidden="true" />
+          <MessageCircle className="w-3.5 h-3.5 text-cyan-300 shrink-0" aria-hidden="true" />
           <label htmlFor="live-comment-input" className="sr-only">
             Comenta o haz una pregunta en el Live
           </label>
@@ -99,12 +99,12 @@ export function LiveFooterBar({
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Comenta en vivo..."
             maxLength={140}
-            className="flex-1 min-w-0 bg-transparent py-0.5 text-[11px] text-slate-800 placeholder:text-slate-500 focus:outline-none"
+            className="flex-1 min-w-0 bg-transparent py-0.5 text-[11px] text-white placeholder:text-zinc-300 focus:outline-none"
           />
           <button
             type="submit"
             aria-label="Enviar comentario"
-            className="shrink-0 inline-flex items-center gap-1 min-h-[28px] px-2.5 py-0.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-display text-[10.5px] font-semibold active:scale-95 transition-all cursor-pointer"
+            className="shrink-0 inline-flex items-center gap-1 min-h-[28px] px-2.5 py-0.5 rounded-full bg-cyan-400 text-slate-950 font-display text-[10.5px] font-bold hover:bg-cyan-300 active:scale-95 transition-all cursor-pointer"
           >
             <span>Enviar</span>
             <Send className="w-3 h-3" />
@@ -116,23 +116,23 @@ export function LiveFooterBar({
           onClick={onOpenShare}
           data-testid="share-live-btn"
           aria-label="Compartir Live en WhatsApp y redes sociales"
-          className="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[34px] px-3 py-1 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-slate-800 font-display text-[11px] font-semibold shadow-[0_2px_10px_rgba(15,23,42,0.1)] active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+          className="shrink-0 inline-flex items-center justify-center gap-1.5 min-h-[34px] px-3 py-1 rounded-full bg-gradient-to-r from-fuchsia-600/90 to-cyan-500/90 border border-white/25 text-white font-display text-[11px] font-bold shadow-[0_4px_14px_rgba(217,70,239,0.28)] hover:brightness-110 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
         >
-          <Share2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+          <Share2 className="w-3.5 h-3.5 shrink-0" />
           <span>Compartir</span>
         </button>
       </div>
 
       {/* Barra principal de acciones en zona natural del pulgar */}
       <div className="flex items-end gap-2">
-        {/* Columna izquierda: etiqueta clara de unidades encima del botón CTA principal */}
+        {/* Columna izquierda: etiqueta de urgencia encima del botón CTA principal */}
         <div className="flex-1 min-w-0 flex flex-col items-start gap-1">
           <div
             data-testid="stock-urgency-tag"
             aria-live="polite"
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/92 backdrop-blur-md border border-amber-300/80 text-amber-900 text-[10.5px] font-semibold tracking-wide leading-none shadow-xs"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-950/90 border border-rose-400/55 text-amber-200 text-[10.5px] font-bold tracking-wide leading-none shadow-[0_2px_10px_rgba(244,63,94,0.3)]"
           >
-            <Flame className="w-3 h-3 text-amber-600 shrink-0" aria-hidden="true" />
+            <Flame className="w-3 h-3 text-amber-400 shrink-0" aria-hidden="true" />
             <span className="font-mono-tabular whitespace-nowrap">
               {formatRemainingProductsLabel(remainingProducts)}
             </span>
@@ -143,7 +143,7 @@ export function LiveFooterBar({
             onClick={handleBuyClick}
             data-testid="primary-buy-cta"
             data-haptic-active={isBuyHaptic ? 'true' : 'false'}
-            className={`w-full min-w-0 min-h-[44px] px-3 py-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-display text-[12px] font-bold tracking-tight leading-tight flex items-center justify-center gap-1.5 shadow-[0_6px_20px_rgba(4,120,87,0.28)] active:scale-[0.98] transition-all cursor-pointer ${
+            className={`w-full min-w-0 min-h-[42px] px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 text-slate-950 font-display text-[12px] font-extrabold tracking-tight leading-tight flex items-center justify-center gap-1.5 shadow-[0_6px_24px_rgba(16,185,129,0.45)] hover:brightness-105 transition-all cursor-pointer ${
               isBuyHaptic ? 'animate-cta-haptic' : 'animate-cta-pulse'
             }`}
           >
@@ -152,8 +152,8 @@ export function LiveFooterBar({
           </button>
         </div>
 
-        {/* Botones de reacción claros y tranquilos */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        {/* Botones de reacción alineados al botón principal */}
+        <div className="flex items-center gap-2 shrink-0">
           {/* Botón corazón con partículas flotantes */}
           <div className="relative shrink-0">
             <div
@@ -175,9 +175,9 @@ export function LiveFooterBar({
                   }`}
                 >
                   {heart.kind === 'like' ? (
-                    <ThumbsUp className="w-[17px] h-[17px] fill-current drop-shadow-[0_2px_6px_rgba(14,165,233,0.45)]" />
+                    <ThumbsUp className="w-[17px] h-[17px] fill-current drop-shadow-[0_2px_8px_rgba(34,211,238,0.7)]" />
                   ) : (
-                    <Heart className="w-[18px] h-[18px] fill-current drop-shadow-[0_2px_6px_rgba(244,63,94,0.45)]" />
+                    <Heart className="w-[18px] h-[18px] fill-current drop-shadow-[0_2px_8px_rgba(244,63,94,0.7)]" />
                   )}
                 </span>
               ))}
@@ -188,7 +188,7 @@ export function LiveFooterBar({
               onClick={() => onLike('heart')}
               data-testid="footer-like-btn"
               aria-label="Enviar corazón en el Live"
-              className="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-rose-500 active:scale-90 transition-all cursor-pointer shadow-[0_2px_10px_rgba(15,23,42,0.1)] animate-live-btn-pulse"
+              className="inline-flex items-center justify-center w-[42px] h-[42px] rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-400 hover:bg-rose-500/30 active:scale-90 transition-all cursor-pointer animate-live-btn-pulse"
             >
               <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
             </button>
@@ -200,26 +200,23 @@ export function LiveFooterBar({
             onClick={() => onLike('like')}
             data-testid="footer-thumbsup-btn"
             aria-label="Dar Me gusta al Live"
-            className="shrink-0 inline-flex items-center justify-center w-[44px] h-[44px] rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-sky-600 active:scale-90 transition-all cursor-pointer shadow-[0_2px_10px_rgba(15,23,42,0.1)] animate-live-btn-pulse"
+            className="shrink-0 inline-flex items-center justify-center w-[42px] h-[42px] rounded-full bg-sky-500/20 border border-sky-400/45 text-sky-300 hover:bg-sky-500/30 active:scale-90 transition-all cursor-pointer animate-live-btn-pulse"
           >
-            <ThumbsUp className="w-4 h-4 fill-sky-500 text-sky-600" />
+            <ThumbsUp className="w-4 h-4 fill-sky-400 text-sky-400" />
           </button>
         </div>
       </div>
 
-      {/* Barra inferior clara y limpia de demanda de pedidos */}
-      <div
-        data-testid="cart-demand-container"
-        className="px-2.5 py-1.5 rounded-xl bg-white/88 backdrop-blur-md border border-white/75 shadow-[0_2px_10px_rgba(15,23,42,0.08)] space-y-1"
-      >
+      {/* Barra delgada inferior de alta demanda según personas agregando al carrito */}
+      <div data-testid="cart-demand-container" className="pt-0.5 space-y-1">
         <div className="flex items-center justify-between gap-2 text-[10.5px] leading-none">
-          <span className="text-slate-700 truncate">
-            <strong className="font-mono-tabular font-bold text-slate-900">
+          <span className="text-zinc-300 truncate">
+            <strong className="font-mono-tabular font-bold text-amber-300">
               {cartDemandCount}
             </strong>{' '}
             personas agregaron al carrito
           </span>
-          <span className="font-mono-tabular font-bold text-emerald-700 shrink-0">
+          <span className="font-mono-tabular font-bold text-emerald-300 shrink-0">
             {demandPercent}% pedido
           </span>
         </div>
@@ -231,12 +228,12 @@ export function LiveFooterBar({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={demandPercent}
-          className="w-full h-1.5 rounded-full bg-slate-200/90 overflow-hidden"
+          className="w-full h-1.5 rounded-full bg-white/15 overflow-hidden"
         >
           <div
             data-testid="cart-demand-fill"
             style={{ width: `${demandPercent}%` }}
-            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-[width] duration-700 ease-out"
+            className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-[width] duration-700 ease-out"
           />
         </div>
       </div>

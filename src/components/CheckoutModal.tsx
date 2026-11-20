@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import {
   Check,
   CheckCircle2,
@@ -48,6 +48,7 @@ export function CheckoutModal({
   onClose,
 }: CheckoutModalProps) {
   const [activeTab, setActiveTab] = useState<ModalTab>(initialTab);
+  const scrollBodyRef = useRef<HTMLDivElement | null>(null);
   const [formValues, setFormValues] = useState<CheckoutFormValues>({
     fullName: '',
     phone: '',
@@ -134,6 +135,12 @@ export function CheckoutModal({
       totalPrice,
       whatsappUrl,
     });
+    scrollBodyRef.current?.scrollTo({ top: 0 });
+  };
+
+  const handleSelectTab = (tab: ModalTab) => {
+    setActiveTab(tab);
+    scrollBodyRef.current?.scrollTo({ top: 0 });
   };
 
   return (
@@ -141,10 +148,7 @@ export function CheckoutModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="checkout-modal-title"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      className="absolute inset-0 z-40 flex items-end justify-center bg-slate-950/50 backdrop-blur-[2px] animate-[fadeIn_160ms_ease-out]"
+      className="absolute inset-0 z-40 flex items-end justify-center bg-black/55 backdrop-blur-sm animate-[fadeIn_160ms_ease-out]"
     >
       <div className="w-full max-h-[90dvh] rounded-t-3xl bg-white border-t border-x border-slate-200 text-slate-900 shadow-2xl flex flex-col overflow-hidden">
         {/* Cabecera fija del modal */}
@@ -186,16 +190,16 @@ export function CheckoutModal({
             <div
               role="tablist"
               aria-label="Opciones del producto"
-              className="mt-3 grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200/90"
+              className="mt-3 grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200"
             >
               <button
                 type="button"
                 role="tab"
                 aria-selected={activeTab === 'checkout'}
-                onClick={() => setActiveTab('checkout')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                onClick={() => handleSelectTab('checkout')}
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   activeTab === 'checkout'
-                    ? 'bg-white text-emerald-800 font-bold shadow-sm ring-1 ring-slate-200/80'
+                    ? 'bg-emerald-600 text-white font-bold shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -205,10 +209,10 @@ export function CheckoutModal({
                 type="button"
                 role="tab"
                 aria-selected={activeTab === 'details'}
-                onClick={() => setActiveTab('details')}
-                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                onClick={() => handleSelectTab('details')}
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   activeTab === 'details'
-                    ? 'bg-white text-emerald-800 font-bold shadow-sm ring-1 ring-slate-200/80'
+                    ? 'bg-emerald-600 text-white font-bold shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -219,19 +223,19 @@ export function CheckoutModal({
         </div>
 
         {/* Contenido desplazable */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-white">
+        <div ref={scrollBodyRef} className="flex-1 overflow-y-auto bg-white px-4 py-4 space-y-4">
           {confirmedOrder ? (
             /* Pantalla de confirmación lista para WhatsApp */
             <div data-testid="order-confirmation" className="space-y-4 pb-2">
               <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-display text-sm font-bold text-emerald-950">
+                  <h3 className="font-display text-sm font-bold text-slate-900">
                     ¡Tu pedido está listo para enviar a Marié!
                   </h3>
-                  <p className="text-xs text-emerald-900/85 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-700 mt-1 leading-relaxed">
                     Toca el botón verde para abrir WhatsApp con tu orden completa y activar tu{' '}
-                    <span className="font-semibold text-emerald-950">
+                    <span className="font-semibold text-emerald-800">
                       {confirmedOrder.combo.isVip ? 'App TyroFem 30D VIP' : 'App TyroFem 30D'}
                     </span>
                     .
@@ -253,7 +257,7 @@ export function CheckoutModal({
                     <span className="font-medium text-slate-900">
                       1x Tyruss Full (500g) · {confirmedOrder.combo.title}
                     </span>
-                    <span className="font-mono-tabular font-semibold text-slate-900 shrink-0">
+                    <span className="font-mono-tabular font-semibold text-slate-800 shrink-0">
                       {formatCOP(confirmedOrder.combo.price)}
                     </span>
                   </div>
@@ -273,7 +277,7 @@ export function CheckoutModal({
                       data-testid="order-item-batido-verde"
                       className="flex items-center justify-between gap-2 text-emerald-700"
                     >
-                      <span className="font-medium">1x {BATIDO_VERDE_ADDON.title}</span>
+                      <span className="font-semibold">1x {BATIDO_VERDE_ADDON.title}</span>
                       <span className="font-mono-tabular font-semibold shrink-0">
                         +{formatCOP(BATIDO_VERDE_ADDON.price)}
                       </span>
@@ -289,16 +293,16 @@ export function CheckoutModal({
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <span className="font-semibold text-slate-800">Total a pagar</span>
+                  <span className="font-semibold text-slate-700">Total a pagar</span>
                   <span
                     data-testid="confirmed-total-price"
-                    className="font-mono-tabular font-extrabold text-emerald-800 text-sm"
+                    className="font-mono-tabular font-extrabold text-teal-700 text-sm"
                   >
                     {formatCOP(confirmedOrder.totalPrice)} COP
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200 space-y-1 text-slate-600">
+                <div className="pt-2 border-t border-slate-200 space-y-1 text-slate-700">
                   <p>
                     <strong className="text-slate-900">Cliente:</strong> {confirmedOrder.customer.fullName}
                   </p>
@@ -321,7 +325,7 @@ export function CheckoutModal({
                 onClick={handleToggleBatidoVerde}
                 className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                   confirmedOrder.includeBatidoVerde
-                    ? 'bg-emerald-50 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.28)]'
+                    ? 'bg-emerald-50 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.3)]'
                     : 'bg-white border-slate-200 hover:border-emerald-400'
                 }`}
               >
@@ -330,7 +334,7 @@ export function CheckoutModal({
                     className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                       confirmedOrder.includeBatidoVerde
                         ? 'bg-emerald-600 border-emerald-600 text-white'
-                        : 'bg-white border-slate-300 text-slate-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-500'
                     }`}
                   >
                     {confirmedOrder.includeBatidoVerde ? (
@@ -348,7 +352,7 @@ export function CheckoutModal({
                         Oferta Live
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
                       {BATIDO_VERDE_ADDON.subtitle}
                     </p>
                   </div>
@@ -380,7 +384,7 @@ export function CheckoutModal({
                       num_items: confirmedOrder.includeBatidoVerde ? 2 : 1,
                     })
                   }
-                  className="w-full min-h-[48px] px-4 py-2.5 rounded-2xl bg-[#25D366] text-slate-950 font-display text-[13px] font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(37,211,102,0.3)] hover:brightness-105 active:scale-[0.98] transition-all whitespace-nowrap"
+                  className="w-full min-h-[48px] px-4 py-2.5 rounded-2xl bg-[#25D366] text-slate-950 font-display text-[13px] font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 hover:brightness-105 active:scale-[0.98] transition-all whitespace-nowrap"
                 >
                   <span>Enviar Pedido por WhatsApp</span>
                   <ExternalLink className="w-4 h-4 shrink-0" />
@@ -441,7 +445,7 @@ export function CheckoutModal({
                       key={step}
                       className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700"
                     >
-                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-mono-tabular font-bold text-[11px] flex items-center justify-center shrink-0">
+                      <span className="w-5 h-5 rounded-full bg-teal-100 text-teal-800 font-mono-tabular font-bold text-[11px] flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
                       <span>{step}</span>
@@ -451,12 +455,12 @@ export function CheckoutModal({
               </div>
 
               <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
-                <Gift className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+                <Gift className="w-5 h-5 text-teal-700 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-display text-xs font-bold text-emerald-950">
+                  <p className="font-display text-xs font-bold text-slate-900">
                     Regalo incluido: {PRODUCT_INFO.appGift.name}
                   </p>
-                  <p className="text-[11px] text-emerald-900/85 mt-0.5 leading-relaxed">
+                  <p className="text-[11px] text-slate-700 mt-0.5 leading-relaxed">
                     {PRODUCT_INFO.appGift.description}
                   </p>
                 </div>
@@ -465,7 +469,7 @@ export function CheckoutModal({
               <button
                 type="button"
                 onClick={() => setActiveTab('checkout')}
-                className="w-full min-h-[44px] rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-display text-xs font-extrabold transition-colors cursor-pointer"
+                className="w-full min-h-[44px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-display text-xs font-extrabold shadow-sm transition-colors cursor-pointer"
               >
                 Elegir mi Combo ahora
               </button>
@@ -475,10 +479,10 @@ export function CheckoutModal({
             <form onSubmit={handleSubmit} noValidate className="space-y-4 pb-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-display text-xs font-bold text-slate-900">
+                  <h3 className="font-display text-xs font-bold text-slate-800">
                     1. Selecciona tu Combo Oficial
                   </h3>
-                  <span className="text-[11px] text-emerald-700 font-semibold">
+                  <span className="text-[11px] text-teal-700 font-semibold">
                     Envío a toda Colombia
                   </span>
                 </div>
@@ -496,8 +500,8 @@ export function CheckoutModal({
                         onClick={() => onSelectCombo(combo.id)}
                         className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
                           isSelected
-                            ? 'bg-emerald-50/85 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.28)]'
-                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60'
+                            ? 'bg-emerald-50/90 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]'
+                            : 'bg-white border-slate-200 hover:border-slate-300 shadow-[0_1px_2px_rgba(15,23,42,0.04)]'
                         }`}
                       >
                         <div className="min-w-0 space-y-0.5">
@@ -509,7 +513,7 @@ export function CheckoutModal({
                               <span
                                 className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                                   combo.isVip
-                                    ? 'bg-amber-100 text-amber-900 border border-amber-300/80'
+                                    ? 'bg-amber-400 text-slate-950'
                                     : 'bg-rose-600 text-white'
                                 }`}
                               >
@@ -520,7 +524,7 @@ export function CheckoutModal({
                           <p className="text-[11px] text-emerald-700 font-semibold">
                             {combo.bonusLabel}
                           </p>
-                          <p className="text-[10.5px] text-slate-500">{combo.subtitle}</p>
+                          <p className="text-[10px] text-slate-500">{combo.subtitle}</p>
                         </div>
 
                         <div className="text-right shrink-0">
@@ -541,17 +545,17 @@ export function CheckoutModal({
 
               {/* Item predeterminado incluido gratis: Loción Térmica (Obsequio) */}
               <div className="space-y-1.5">
-                <h3 className="font-display text-xs font-bold text-slate-900">
+                <h3 className="font-display text-xs font-bold text-slate-800">
                   Obsequio predeterminado incluido en tu pedido
                 </h3>
                 <div
                   data-testid="gift-locion-termica-card"
-                  className="w-full p-3 rounded-2xl border bg-amber-50/75 border-amber-300 flex items-center justify-between gap-2.5"
+                  className="w-full p-3 rounded-2xl border bg-amber-50/90 border-amber-300 shadow-[0_0_0_1px_rgba(245,158,11,0.18)] flex items-center justify-between gap-2.5"
                 >
                   <div className="flex items-start gap-2.5 min-w-0">
                     <span
                       aria-hidden="true"
-                      className="mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-amber-400 text-slate-950"
+                      className="mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 bg-amber-500 text-white"
                     >
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </span>
@@ -578,7 +582,7 @@ export function CheckoutModal({
 
               {/* Adición opcional: Batido Verde */}
               <div className="space-y-1.5">
-                <h3 className="font-display text-xs font-bold text-slate-900">
+                <h3 className="font-display text-xs font-bold text-slate-800">
                   Adición recomendada en el Live
                 </h3>
                 <button
@@ -589,8 +593,8 @@ export function CheckoutModal({
                   onClick={handleToggleBatidoVerde}
                   className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
                     includeBatidoVerde
-                      ? 'bg-emerald-50/85 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.28)]'
-                      : 'bg-white border-slate-200 hover:border-emerald-400'
+                      ? 'bg-emerald-50 border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.3)]'
+                      : 'bg-white border-slate-200 hover:border-emerald-400 shadow-[0_1px_2px_rgba(15,23,42,0.04)]'
                   }`}
                 >
                   <div className="flex items-start gap-2.5 min-w-0">
@@ -598,7 +602,7 @@ export function CheckoutModal({
                       className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                         includeBatidoVerde
                           ? 'bg-emerald-600 border-emerald-600 text-white'
-                          : 'bg-white border-slate-300 text-slate-500'
+                          : 'bg-slate-50 border-slate-300 text-slate-500'
                       }`}
                     >
                       {includeBatidoVerde ? (
@@ -616,7 +620,7 @@ export function CheckoutModal({
                           Oferta Live
                         </span>
                       </div>
-                      <p className="text-[10.5px] text-slate-600 mt-0.5">
+                      <p className="text-[10.5px] text-slate-500 mt-0.5">
                         {BATIDO_VERDE_ADDON.subtitle}
                       </p>
                     </div>
@@ -641,7 +645,7 @@ export function CheckoutModal({
                     {selectedCombo.title} + {GIFT_ADDON.title}
                     {includeBatidoVerde ? ' + Batido Verde' : ''}
                   </p>
-                  <p className="text-[11px] text-emerald-700 font-medium truncate">
+                  <p className="text-[11px] text-emerald-700 font-semibold truncate">
                     Incluye {selectedCombo.bonusLabel.replace('+ ', '')}
                     {savings > 0
                       ? ` · Ahorras ${formatCOP(savings + (includeBatidoVerde ? BATIDO_VERDE_ADDON.regularPrice - BATIDO_VERDE_ADDON.price : 0))} COP`
@@ -651,7 +655,7 @@ export function CheckoutModal({
                 <div className="text-right shrink-0">
                   <span
                     data-testid="checkout-total-price"
-                    className="font-mono-tabular text-base font-extrabold text-emerald-800"
+                    className="font-mono-tabular text-base font-extrabold text-teal-700"
                   >
                     {formatCOP(totalOrderPrice)} COP
                   </span>
@@ -660,7 +664,7 @@ export function CheckoutModal({
 
               {/* Formulario de datos de envío */}
               <div className="space-y-3">
-                <h3 className="font-display text-xs font-bold text-slate-900">
+                <h3 className="font-display text-xs font-bold text-slate-800">
                   2. Tus datos para el envío contra entrega
                 </h3>
 
@@ -674,7 +678,7 @@ export function CheckoutModal({
                     value={formValues.fullName}
                     onChange={(e) => handleFieldChange('fullName', e.target.value)}
                     placeholder="Ej. Laura Gómez"
-                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
                   />
                   {errors.fullName && (
                     <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
@@ -695,7 +699,7 @@ export function CheckoutModal({
                       value={formValues.phone}
                       onChange={(e) => handleFieldChange('phone', e.target.value)}
                       placeholder="Ej. 300 123 4567"
-                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
+                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
                     />
                     {errors.phone && (
                       <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
@@ -714,7 +718,7 @@ export function CheckoutModal({
                       value={formValues.city}
                       onChange={(e) => handleFieldChange('city', e.target.value)}
                       placeholder="Ej. Medellín"
-                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
+                      className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
                     />
                     {errors.city && (
                       <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">
@@ -734,7 +738,7 @@ export function CheckoutModal({
                     value={formValues.address}
                     onChange={(e) => handleFieldChange('address', e.target.value)}
                     placeholder="Ej. Cra 43A # 1-50, Barrio El Poblado"
-                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full min-h-[42px] px-3 py-2 rounded-xl bg-white border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
                   />
                   {errors.address && (
                     <p role="alert" className="mt-1 text-[11px] font-medium text-rose-600">

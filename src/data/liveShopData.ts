@@ -240,3 +240,57 @@ export const SIMULATED_CHAT_QUEUE: Omit<ChatMessage, 'id' | 'timestamp'>[] = [
     isHost: true,
   },
 ];
+
+export interface CustomerTestimonial {
+  id: 'camila' | 'paola' | 'diana' | 'juliana';
+  name: string;
+  city: string;
+  initials: string;
+  quote: string;
+  verifiedLabel: string;
+  rating: number;
+}
+
+export const CUSTOMER_TESTIMONIALS: CustomerTestimonial[] = [
+  {
+    id: 'camila',
+    name: 'Camila Restrepo',
+    city: 'Medellín',
+    initials: 'CR',
+    quote:
+      'Desde la segunda semana con Tyruss Full me siento liviana y con energía todo el día.',
+    verifiedLabel: 'Compra verificada',
+    rating: 5,
+  },
+  {
+    id: 'paola',
+    name: 'Paola Gómez',
+    city: 'Bogotá',
+    initials: 'PG',
+    quote:
+      'Llegó contra entrega en 2 días y con la App TyroFem 30D ya bajé la inflamación.',
+    verifiedLabel: 'Compra verificada',
+    rating: 5,
+  },
+  {
+    id: 'diana',
+    name: 'Diana Silva',
+    city: 'Cali',
+    initials: 'DS',
+    quote:
+      'Sabe delicioso con leche de almendras y por fin duermo mejor sin pesadez.',
+    verifiedLabel: 'Compra verificada',
+    rating: 5,
+  },
+  {
+    id: 'juliana',
+    name: 'Juliana Montoya',
+    city: 'Barranquilla',
+    initials: 'JM',
+    quote:
+      'Voy por mi segundo combo. Cero azúcar añadida y la app acompaña todo el proceso.',
+    verifiedLabel: 'Compra verificada',
+    rating: 5,
+  },
+];
+

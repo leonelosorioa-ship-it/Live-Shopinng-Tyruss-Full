@@ -9,6 +9,7 @@ import {
 import { LiveVideoStage } from './components/LiveVideoStage';
 import { LiveHeader } from './components/LiveHeader';
 import { LiveChatFeed } from './components/LiveChatFeed';
+import { LiveTestimonialsCarousel } from './components/LiveTestimonialsCarousel';
 import { LiveFooterBar, type FloatingHeartParticle } from './components/LiveFooterBar';
 import { CheckoutModal, type ModalTab } from './components/CheckoutModal';
 import { ShareModal } from './components/ShareModal';
@@ -185,17 +186,17 @@ export default function App() {
       nextTimer = window.setTimeout(() => {
         if (cancelled) return;
         spawnFloatingHeart(true);
-        if (Math.random() < 0.12) {
+        if (Math.random() < 0.2) {
           followUpTimer = window.setTimeout(() => {
             if (!cancelled) spawnFloatingHeart(true);
-          }, 520);
+          }, 380);
         }
-        const organicDelay = 2800 + Math.round(Math.random() * 2200);
+        const organicDelay = 1600 + Math.round(Math.random() * 1300);
         scheduleNext(organicDelay);
       }, delayMs);
     };
 
-    scheduleNext(1500);
+    scheduleNext(950);
 
     return () => {
       cancelled = true;
@@ -374,9 +375,9 @@ export default function App() {
   }, []);
 
   return (
-    <main className="sticky top-0 w-full h-[100dvh] bg-[#EFF3F1] flex items-center justify-center overflow-hidden">
-      {/* Contenedor a pantalla completa en móvil (edge-to-edge) y marco 9:16 limpio en escritorio */}
-      <div className="relative w-full max-w-none sm:max-w-[430px] h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-slate-100 overflow-hidden flex flex-col justify-between rounded-none border-0 sm:rounded-[24px] sm:border sm:border-slate-200 sm:shadow-[0_20px_60px_rgba(15,23,42,0.14)]">
+    <main className="sticky top-0 w-full h-[100dvh] bg-black flex items-center justify-center overflow-hidden">
+      {/* Contenedor a pantalla completa en móvil (edge-to-edge) y marco 9:16 en escritorio */}
+      <div className="relative w-full max-w-none sm:max-w-[430px] h-[100dvh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-black overflow-hidden flex flex-col justify-between rounded-none border-0 sm:rounded-[24px] sm:border sm:border-white/12 sm:shadow-[0_0_80px_rgba(6,182,212,0.14)]">
         {/* Capa 1: Video de fondo de la transmisión en vivo */}
         <LiveVideoStage
           videoRef={videoRef}
@@ -419,16 +420,16 @@ export default function App() {
                     type="button"
                     onClick={handleActivateAudio}
                     data-testid="connecting-live-pill"
-                    className="pointer-events-auto max-w-[300px] px-5 py-3 rounded-2xl bg-white/90 backdrop-blur-md border border-white/85 shadow-[0_8px_28px_rgba(15,23,42,0.14)] text-center space-y-1 cursor-pointer active:scale-[0.98] transition-transform"
+                    className="pointer-events-auto max-w-[300px] px-5 py-3 rounded-2xl bg-black/55 backdrop-blur-md border border-white/15 shadow-[0_8px_28px_rgba(0,0,0,0.38)] text-center space-y-1 cursor-pointer active:scale-[0.98] transition-transform"
                   >
-                    <p className="inline-flex items-center justify-center gap-2 font-display text-[14px] font-bold text-slate-900 leading-tight">
+                    <p className="inline-flex items-center justify-center gap-2 font-display text-[14px] font-bold text-white leading-tight">
                       <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-85" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
                       </span>
                       <span>Conectando al Live</span>
                     </p>
-                    <p className="text-[12px] text-slate-600 leading-snug">
+                    <p className="text-[12px] text-white/90 leading-snug">
                       Marié está en vivo presentando Tyruss Full
                     </p>
                   </button>
@@ -439,9 +440,9 @@ export default function App() {
                     type="button"
                     onClick={handleActivateAudio}
                     data-testid="activate-audio-btn"
-                    className="pointer-events-auto min-h-[46px] inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-white/92 hover:bg-white backdrop-blur-md border border-white/90 text-slate-900 font-display text-[14px] font-semibold tracking-tight whitespace-nowrap shadow-[0_10px_28px_rgba(15,23,42,0.16)] active:scale-[0.97] transition-all cursor-pointer"
+                    className="pointer-events-auto min-h-[46px] inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-full bg-black/60 hover:bg-black/72 backdrop-blur-md border border-white/25 text-white font-display text-[14px] font-semibold tracking-tight whitespace-nowrap shadow-[0_10px_28px_rgba(0,0,0,0.42)] active:scale-[0.97] transition-all cursor-pointer animate-cta-pulse"
                   >
-                    <Volume2 className="w-5 h-5 text-emerald-700 shrink-0" aria-hidden="true" />
+                    <Volume2 className="w-5 h-5 text-white shrink-0" aria-hidden="true" />
                     <span>Toca para activar el sonido</span>
                   </button>
                 </div>
@@ -449,6 +450,7 @@ export default function App() {
             </div>
           )}
 
+          <LiveTestimonialsCarousel paused={liveEnded || modalState.open || shareOpen} />
           <LiveChatFeed messages={chatMessages} />
         </div>
 

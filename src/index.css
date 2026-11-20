@@ -13,8 +13,8 @@
     margin: 0;
     padding: 0;
     font-family: var(--font-sans);
-    background-color: #eff3f1;
-    color: #0f172a;
+    background-color: #000000;
+    color: #ffffff;
     overflow-x: clip;
     scrollbar-width: none;
   }
@@ -97,21 +97,21 @@
   will-change: transform, opacity;
 }
 
-/* Efecto pulsante sutil para el indicador LIVE SHOP */
+/* Efecto pulsante (agranda y encoge) para el indicador LIVE SHOP */
 @keyframes livePulseScale {
   0%,
   100% {
-    transform: scale(0.988);
-    box-shadow: 0 0 6px rgba(225, 29, 72, 0.4);
+    transform: scale(0.94);
+    box-shadow: 0 0 8px rgba(225, 29, 72, 0.55);
   }
   50% {
-    transform: scale(1.024);
-    box-shadow: 0 0 11px rgba(244, 63, 94, 0.65);
+    transform: scale(1.1);
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.95), 0 0 6px rgba(255, 255, 255, 0.35);
   }
 }
 
 .animate-live-pulse {
-  animation: livePulseScale 3.2s ease-in-out infinite;
+  animation: livePulseScale 1.35s ease-in-out infinite;
   transform-origin: center;
   will-change: transform, box-shadow;
 }
@@ -119,15 +119,15 @@
 @keyframes buttonPulseScale {
   0%,
   100% {
-    transform: scale(0.988);
+    transform: scale(0.94);
   }
   50% {
-    transform: scale(1.026);
+    transform: scale(1.08);
   }
 }
 
 .animate-live-btn-pulse {
-  animation: buttonPulseScale 3.6s ease-in-out infinite;
+  animation: buttonPulseScale 1.35s ease-in-out infinite;
   transform-origin: center;
   will-change: transform;
 }
@@ -135,15 +135,15 @@
 @keyframes ctaPulseScale {
   0%,
   100% {
-    transform: scale(0.992);
+    transform: scale(0.965);
   }
   50% {
-    transform: scale(1.015);
+    transform: scale(1.035);
   }
 }
 
 .animate-cta-pulse {
-  animation: ctaPulseScale 3.4s ease-in-out infinite;
+  animation: ctaPulseScale 1.35s ease-in-out infinite;
   transform-origin: center;
   will-change: transform;
 }
@@ -243,6 +243,22 @@
   will-change: transform, opacity;
 }
 
+@keyframes testimonialSlideIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(-10px, 8px, 0) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-testimonial-in {
+  animation: testimonialSlideIn 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
 /* Ocultar scrollbar en chat y modal manteniendo usabilidad táctil */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -263,7 +279,8 @@
   .animate-entry-ripple-delayed,
   .animate-entry-glow,
   .animate-tap-nudge,
-  .animate-prompt-in {
+  .animate-prompt-in,
+  .animate-testimonial-in {
     animation: none !important;
   }
 }
