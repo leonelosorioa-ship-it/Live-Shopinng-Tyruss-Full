@@ -144,7 +144,7 @@ export function LiveFooterBar({
             data-testid="primary-buy-cta"
             data-haptic-active={isBuyHaptic ? 'true' : 'false'}
             className={`w-full min-w-0 min-h-[44px] px-3 py-1.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-display text-[12px] font-bold tracking-tight leading-tight flex items-center justify-center gap-1.5 shadow-[0_6px_20px_rgba(4,120,87,0.28)] active:scale-[0.98] transition-all cursor-pointer ${
-              isBuyHaptic ? 'animate-cta-haptic' : ''
+              isBuyHaptic ? 'animate-cta-haptic' : 'animate-cta-pulse'
             }`}
           >
             <ShoppingCart className="w-4 h-4 shrink-0" />
@@ -188,7 +188,7 @@ export function LiveFooterBar({
               onClick={() => onLike('heart')}
               data-testid="footer-like-btn"
               aria-label="Enviar corazón en el Live"
-              className="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-rose-500 active:scale-90 transition-all cursor-pointer shadow-[0_2px_10px_rgba(15,23,42,0.1)]"
+              className="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-rose-500 active:scale-90 transition-all cursor-pointer shadow-[0_2px_10px_rgba(15,23,42,0.1)] animate-live-btn-pulse"
             >
               <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
             </button>
@@ -200,7 +200,7 @@ export function LiveFooterBar({
             onClick={() => onLike('like')}
             data-testid="footer-thumbsup-btn"
             aria-label="Dar Me gusta al Live"
-            className="shrink-0 inline-flex items-center justify-center w-[44px] h-[44px] rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-sky-600 active:scale-90 transition-all cursor-pointer shadow-[0_2px_10px_rgba(15,23,42,0.1)]"
+            className="shrink-0 inline-flex items-center justify-center w-[44px] h-[44px] rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-white/80 text-sky-600 active:scale-90 transition-all cursor-pointer shadow-[0_2px_10px_rgba(15,23,42,0.1)] animate-live-btn-pulse"
           >
             <ThumbsUp className="w-4 h-4 fill-sky-500 text-sky-600" />
           </button>

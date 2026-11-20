@@ -97,21 +97,21 @@
   will-change: transform, opacity;
 }
 
-/* Efecto pulsante (agranda y encoge) para el indicador LIVE SHOP */
+/* Efecto pulsante sutil para el indicador LIVE SHOP */
 @keyframes livePulseScale {
   0%,
   100% {
-    transform: scale(0.94);
-    box-shadow: 0 0 8px rgba(225, 29, 72, 0.55);
+    transform: scale(0.988);
+    box-shadow: 0 0 6px rgba(225, 29, 72, 0.4);
   }
   50% {
-    transform: scale(1.1);
-    box-shadow: 0 0 18px rgba(244, 63, 94, 0.95), 0 0 6px rgba(255, 255, 255, 0.35);
+    transform: scale(1.024);
+    box-shadow: 0 0 11px rgba(244, 63, 94, 0.65);
   }
 }
 
 .animate-live-pulse {
-  animation: livePulseScale 1.35s ease-in-out infinite;
+  animation: livePulseScale 3.2s ease-in-out infinite;
   transform-origin: center;
   will-change: transform, box-shadow;
 }
@@ -119,15 +119,15 @@
 @keyframes buttonPulseScale {
   0%,
   100% {
-    transform: scale(0.94);
+    transform: scale(0.988);
   }
   50% {
-    transform: scale(1.08);
+    transform: scale(1.026);
   }
 }
 
 .animate-live-btn-pulse {
-  animation: buttonPulseScale 1.35s ease-in-out infinite;
+  animation: buttonPulseScale 3.6s ease-in-out infinite;
   transform-origin: center;
   will-change: transform;
 }
@@ -135,15 +135,15 @@
 @keyframes ctaPulseScale {
   0%,
   100% {
-    transform: scale(0.965);
+    transform: scale(0.992);
   }
   50% {
-    transform: scale(1.035);
+    transform: scale(1.015);
   }
 }
 
 .animate-cta-pulse {
-  animation: ctaPulseScale 1.35s ease-in-out infinite;
+  animation: ctaPulseScale 3.4s ease-in-out infinite;
   transform-origin: center;
   will-change: transform;
 }

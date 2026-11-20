@@ -185,17 +185,17 @@ export default function App() {
       nextTimer = window.setTimeout(() => {
         if (cancelled) return;
         spawnFloatingHeart(true);
-        if (Math.random() < 0.2) {
+        if (Math.random() < 0.12) {
           followUpTimer = window.setTimeout(() => {
             if (!cancelled) spawnFloatingHeart(true);
-          }, 380);
+          }, 520);
         }
-        const organicDelay = 1600 + Math.round(Math.random() * 1300);
+        const organicDelay = 2800 + Math.round(Math.random() * 2200);
         scheduleNext(organicDelay);
       }, delayMs);
     };
 
-    scheduleNext(950);
+    scheduleNext(1500);
 
     return () => {
       cancelled = true;
